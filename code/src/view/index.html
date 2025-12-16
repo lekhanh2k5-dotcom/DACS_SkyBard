@@ -220,6 +220,63 @@
             document.querySelectorAll('.library-tab').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
         }
+
+        let currentSong = null;
+        let isPlaying = false;
+
+        function onSongCardClick(songData, isOwned) {
+            if (!isOwned) {
+                return;
+            }
+
+            currentSong = songData;
+            document.getElementById('statusTitle').textContent = songData.title || 'Chưa rõ tên';
+            document.getElementById('statusSub').textContent = songData.artist || 'Nghệ sĩ không rõ';
+            
+            isPlaying = false;
+            updatePlayButton();
+        }
+
+        function updatePlayButton() {
+            const btnPlay = document.getElementById('btnMainPlay');
+            const svg = btnPlay.querySelector('svg');
+            
+            if (isPlaying) {
+                svg.innerHTML = '<path d="M5 2h2v12H5V2zm4 0h2v12H9V2z" />';
+                btnPlay.setAttribute('title', 'Tạm dừng');
+            } else {
+                svg.innerHTML = '<path d="M3 2l10 6-10 6V2z" />';
+                btnPlay.setAttribute('title', 'Phát');
+            }
+        }
+
+        document.getElementById('btnMainPlay')?.addEventListener('click', () => {
+            if (!currentSong) {
+                alert('Vui lòng chọn bài hát trước!');
+                return;
+            }
+
+            isPlaying = !isPlaying;
+            updatePlayButton();
+
+            if (isPlaying) {
+                console.log('Đang phát:', currentSong);
+                document.getElementById('statusSub').textContent = '▶ Đang phát...';
+                
+                if (window.api && currentSong.songNotes) {
+                    window.api.playOnline(currentSong.songNotes);
+                }
+            } else {
+                console.log('Tạm dừng:', currentSong);
+                document.getElementById('statusSub').textContent = '⏸ Đã tạm dừng';
+                
+                if (window.api) {
+                    window.api.stopMusic();
+                }
+            }
+        });
+
+        window.onSongCardClick = onSongCardClick;
     </script>
 
     <script type="module" src="renderer.js"></script>

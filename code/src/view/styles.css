@@ -211,56 +211,94 @@ body {
 
 /* GRID BÀI HÁT */
 .song-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .song-card {
     background: var(--bg-card);
-    padding: 16px;
+    padding: 10px 20px;
     border-radius: 8px;
-    transition: 0.3s;
+    transition: 0.2s;
     cursor: pointer;
-    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid transparent;
 }
 
 .song-card:hover {
     background: var(--bg-hover);
-    transform: translateY(-5px);
+    border-color: #333;
+    transform: translateX(5px);
 }
 
 .card-img {
-    width: 100%;
-    height: 120px;
+    width: 45px;
+    height: 45px;
     background: #333;
     border-radius: 4px;
-    margin-bottom: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 40px;
+    font-size: 20px;
+    margin-right: 15px;
+    /* Cách chữ ra */
+    margin-bottom: 0;
+    /* Bỏ margin dưới cũ */
+    flex-shrink: 0;
+    /* Không bị co lại */
+}
+
+/* 4. Khu vực thông tin ở giữa */
+.card-info {
+    flex: 1;
+    /* Chiếm hết khoảng trống ở giữa */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .card-title {
     font-weight: 700;
     font-size: 15px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 5px;
+    color: white;
+}
+
+/* Hàng thông tin phụ (Tác giả - Người soạn) */
+.card-meta {
+    font-size: 12px;
+    color: var(--text-sub);
+    display: flex;
+    gap: 15px;
+}
+
+.card-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 5. Giá tiền/Trạng thái nằm bên phải cùng */
+.card-action {
+    text-align: right;
+    min-width: 100px;
 }
 
 .card-price {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--accent-gold);
     font-weight: bold;
 }
 
 .card-owned {
     color: var(--primary);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: bold;
+    background: rgba(29, 185, 84, 0.1);
+    padding: 5px 10px;
+    border-radius: 15px;
 }
 
 /* SETTINGS FORM */
