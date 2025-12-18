@@ -1,15 +1,66 @@
 {
-  "name": "code",
+  "name": "skybard",
   "version": "1.0.0",
-  "description": "",
-  "main": "src/main/main.js",
+  "description": "SkyBard - Music Assistant for Sky: Children of the Light",
+  "main": "dist-electron/main.js",
   "scripts": {
-    "start": "electron ."
+    "dev": "vite",
+    "build": "vite build && electron-builder",
+    "build:win": "vite build && electron-builder --win --x64",
+    "build:dir": "vite build && electron-builder --dir",
+    "start": "vite"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "electron",
+    "music",
+    "sky",
+    "game",
+    "assistant"
+  ],
+  "author": "SkyBard Team",
+  "license": "MIT",
+  "build": {
+    "appId": "com.skybard.app",
+    "productName": "SkyBard",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "dist",
+        "to": "dist",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
   "devDependencies": {
-    "electron": "^39.2.7"
+    "@vitejs/plugin-react": "^5.1.2",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "vite": "^7.3.0",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6"
+  },
+  "dependencies": {
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   }
 }

@@ -22,7 +22,14 @@ function createWindow() {
         }
     });
     mainWindow.setMenuBarVisibility(false);
-    mainWindow.loadFile(path.join(__dirname, '../view/index.html'));
+
+    if (process.env.VITE_DEV_SERVER_URL) {
+        mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+    } else {
+        mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    }
+
+    console.log('Loading from:', path.join(__dirname, '../dist/index.html'));
 }
 
 app.whenReady().then(createWindow);
