@@ -9,7 +9,8 @@ export default function PlayerBar() {
         playbackSpeed,
         setPlaybackMode,
         setPlaybackSpeed,
-        togglePlayback
+        togglePlayback,
+        importSongFile
     } = useApp();
 
     const playbackModes = ['once', 'sequence', 'shuffle', 'repeat-one'];
@@ -127,7 +128,11 @@ export default function PlayerBar() {
             </div>
 
             <div className="player-right">
-                <button className="btn-add" title="Thêm vào playlist">
+                <button 
+                    className="btn-add" 
+                    title="Import file nhạc từ máy tính"
+                    onClick={importSongFile}
+                >
                     ➕
                 </button>
             </div>

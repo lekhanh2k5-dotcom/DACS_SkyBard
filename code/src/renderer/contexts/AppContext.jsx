@@ -61,8 +61,8 @@ export const AppProvider = ({ children }) => {
     loadSongsFromFiles();
   }, []);
 
-  // --- HÀM PHÁT NHẠC: Xử lý cả bài từ mockSongs và từ file ---
-  const playSong = async (songKey) => {
+  // --- HÀM CHỌN BÀI HÁT: Chỉ load và set currentSong, không phát ---
+  const selectSong = async (songKey) => {
     const songMetadata = songs[songKey];
     if (!songMetadata) return;
 
@@ -76,14 +76,14 @@ export const AppProvider = ({ children }) => {
           ...songMetadata,
           key: songKey
         };
-        console.log(`Phát bài từ file: ${songMetadata.fileName}`);
+        console.log(`Chọn bài từ file: ${songMetadata.fileName}`);
       } else if (songMetadata.songNotes && songMetadata.songNotes.length > 0) {
-        // Nếu bài hát có sẵn songNotes (từ mockSongs), phát luôn
+        // Nếu bài hát có sẵn songNotes (từ mockSongs)
         fullSongData = {
           ...songMetadata,
           key: songKey
         };
-        console.log(`Phát bài từ mockSongs: ${songMetadata.name}`);
+        console.log(`Chọn bài từ mockSongs: ${songMetadata.name}`);
       } else {
         // Trường hợp khác: thử đọc file theo tên bài hát
         const fileName = `${songMetadata.name}.txt`;
@@ -106,22 +106,24 @@ export const AppProvider = ({ children }) => {
         }
       }
 
-      // Cập nhật state và phát nhạc
+      // Chỉ cập nhật currentSong, KHÔNG phát nhạc
       if (fullSongData && fullSongData.songNotes && fullSongData.songNotes.length > 0) {
         setCurrentSong(fullSongData);
-        setIsPlaying(true);
+        setIsPlaying(false); // Đặt về trạng thái dừng
 
-        // Gửi lệnh phát xuống Main process
+        // Dừng nhạc đang phát (nếu có)
         if (window.api) {
-          window.api.playOnline(fullSongData.songNotes);
+          window.api.stopMusic();
         }
+
+        console.log(`Đã chọn bài: ${fullSongData.name}`);
       } else {
         alert('Bài hát này chưa có nốt nhạc!');
       }
 
     } catch (error) {
-      console.error("Lỗi khi phát nhạc:", error);
-      alert('Có lỗi xảy ra khi phát nhạc!');
+      console.error("Lỗi khi chọn bài hát:", error);
+      alert('Có lỗi xảy ra khi chọn bài hát!');
     }
   };
 
@@ -135,13 +137,15 @@ export const AppProvider = ({ children }) => {
     setIsPlaying(newPlayingState);
 
     if (newPlayingState) {
-      // Tiếp tục phát
+      // Phát nhạc
       if (window.api && currentSong.songNotes) {
+        console.log(`Bắt đầu phát: ${currentSong.name}`);
         window.api.playOnline(currentSong.songNotes);
       }
     } else {
       // Dừng phát
       if (window.api) {
+        console.log('Dừng phát nhạc');
         window.api.stopMusic();
       }
     }
@@ -165,6 +169,60 @@ export const AppProvider = ({ children }) => {
     }));
   };
 
+  // Hàm import file nhạc từ máy tính
+  const importSongFile = async () => {
+    if (!window.api || !window.api.importSongFile) {
+      alert('Tính năng import không khả dụng!');
+      return;
+    }
+
+    try {
+      const result = await window.api.importSongFile();
+
+      if (result.canceled) {
+        return; // Người dùng hủy
+      }
+
+      if (result.error) {
+        alert(`Lỗi khi import file: ${result.error}`);
+        return;
+      }
+
+      if (result.success && result.songData) {
+        // Tạo key mới cho bài hát
+        const songKey = `song_imported_${Date.now()}`;
+        const newSong = {
+          name: result.songData.name || 'Unknown',
+          author: result.songData.author || 'Unknown',
+          composer: result.songData.transcribedBy || 'Unknown',
+          fileName: result.fileName,
+          price: 0,
+          isOwned: true,
+          isFavorite: false,
+          songNotes: result.songData.songNotes || [],
+          bpm: result.songData.bpm,
+          isFromFile: true,
+          isImported: true
+        };
+
+        // Thêm bài hát mới vào danh sách
+        setSongs(prev => ({
+          ...prev,
+          [songKey]: newSong
+        }));
+
+        // Tự động chọn bài vừa import
+        await selectSong(songKey);
+
+        alert(`Đã import thành công: ${newSong.name}`);
+        console.log(`Imported song: ${newSong.name}`);
+      }
+    } catch (error) {
+      console.error('Error in importSongFile:', error);
+      alert('Có lỗi xảy ra khi import file!');
+    }
+  };
+
   const value = {
     songs,
     currentSong,
@@ -177,10 +235,11 @@ export const AppProvider = ({ children }) => {
     setActiveLibraryTab,
     setPlaybackMode,
     setPlaybackSpeed,
-    playSong,        // <-- Xuất hàm mới này ra để Library dùng
-    togglePlayback,
+    selectSong,      // Hàm chọn bài (không phát)
+    togglePlayback,  // Hàm phát/dừng
     buySong,
     toggleFavorite,
+    importSongFile,  // Hàm import file nhạc
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

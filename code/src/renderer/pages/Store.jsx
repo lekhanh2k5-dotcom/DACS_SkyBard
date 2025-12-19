@@ -2,7 +2,7 @@ import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
 
 export default function Store() {
-    const { songs, playSong } = useApp();
+    const { songs, selectSong } = useApp();
 
     return (
         <div id="view-store" className="content-view active">
@@ -15,7 +15,7 @@ export default function Store() {
                         key={key}
                         song={songs[key]}
                         songKey={key}
-                        onPlay={() => playSong(key)}
+                        onPlay={() => selectSong(key)}
                     />
                 ))}
             </div>

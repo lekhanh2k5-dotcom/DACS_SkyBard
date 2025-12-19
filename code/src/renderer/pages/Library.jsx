@@ -3,8 +3,8 @@ import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
 
 export default function Library() {
-    // Lấy hàm playSong từ Context
-    const { songs, activeLibraryTab, setActiveLibraryTab, playSong } = useApp();
+    // Lấy hàm selectSong từ Context
+    const { songs, activeLibraryTab, setActiveLibraryTab, selectSong } = useApp();
 
     const ownedSongs = Object.keys(songs)
         .filter(key => songs[key].isOwned)
@@ -45,8 +45,8 @@ export default function Library() {
                             key={key}
                             song={displaySongs[key]}
                             songKey={key}
-                            // --- GỌI HÀM playSong TỪ CONTEXT ---
-                            onPlay={() => playSong(key)}
+                            // --- GỌI HÀM selectSong - CHỈ CHỌN BÀI, KHÔNG PHÁT ---
+                            onPlay={() => selectSong(key)}
                         />
                     ))
                 ) : (

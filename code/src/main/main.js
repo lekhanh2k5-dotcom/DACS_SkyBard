@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -77,6 +77,35 @@ ipcMain.on('stop-music', () => {
     }
 });
 
+// Hàm helper để detect và đọc file với encoding phù hợp
+function readFileWithEncoding(filePath) {
+    // Đọc toàn bộ file
+    const buffer = fs.readFileSync(filePath);
+    let content = '';
+
+    // Check BOM (Byte Order Mark) và decode phù hợp
+    if (buffer[0] === 0xFF && buffer[1] === 0xFE) {
+        // UTF-16LE - bỏ qua 2 bytes BOM
+        content = buffer.slice(2).toString('utf16le');
+    } else if (buffer[0] === 0xFE && buffer[1] === 0xFF) {
+        // UTF-16BE - bỏ qua 2 bytes BOM
+        content = buffer.slice(2).toString('utf16be');
+    } else if (buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+        // UTF-8 with BOM - bỏ qua 3 bytes BOM
+        content = buffer.slice(3).toString('utf-8');
+    } else {
+        // Default to UTF-8 (no BOM)
+        content = buffer.toString('utf-8');
+    }
+
+    // Loại bỏ BOM character nếu vẫn còn (U+FEFF)
+    if (content.charCodeAt(0) === 0xFEFF) {
+        content = content.slice(1);
+    }
+
+    return content;
+}
+
 // Đăng ký hàm đọc file nhạc
 ipcMain.handle('read-song-file', async (event, fileName) => {
     try {
@@ -86,7 +115,7 @@ ipcMain.handle('read-song-file', async (event, fileName) => {
 
         // Đọc file
         if (fs.existsSync(filePath)) {
-            const content = fs.readFileSync(filePath, 'utf-8');
+            const content = readFileWithEncoding(filePath);
             return JSON.parse(content); // Trả về object JSON cho React
         } else {
             return { error: 'File not found' };
@@ -115,11 +144,18 @@ ipcMain.handle('get-all-songs', async () => {
 
         // Đọc nội dung từng file
         const songsData = [];
+        console.log(`Found ${txtFiles.length} .txt files in songs directory`);
+
         for (const file of txtFiles) {
             try {
                 const filePath = path.join(songsDir, file);
-                const content = fs.readFileSync(filePath, 'utf-8');
+                console.log(`Reading file: ${file}`);
+
+                const content = readFileWithEncoding(filePath);
+                console.log(`Content length for ${file}: ${content.length} characters`);
+
                 const jsonData = JSON.parse(content);
+                console.log(`Successfully parsed ${file}: ${jsonData.name || 'unnamed'}`);
 
                 // Thêm filename vào data để sau này dễ xử lý
                 if (Array.isArray(jsonData)) {
@@ -136,13 +172,61 @@ ipcMain.handle('get-all-songs', async () => {
                     });
                 }
             } catch (err) {
-                console.error(`Error reading file ${file}:`, err);
+                console.error(`❌ Error reading file ${file}:`, err.message);
+                console.error(`Stack:`, err.stack);
             }
         }
 
+        console.log(`Total songs loaded: ${songsData.length}`);
         return songsData;
     } catch (err) {
         console.error('Error scanning songs directory:', err);
+        return { error: err.message };
+    }
+});
+
+// Handler để mở dialog chọn file và import vào thư mục songs
+ipcMain.handle('import-song-file', async () => {
+    try {
+        const result = await dialog.showOpenDialog(mainWindow, {
+            title: 'Chọn file nhạc',
+            filters: [
+                { name: 'Text Files', extensions: ['txt'] }
+            ],
+            properties: ['openFile']
+        });
+
+        if (result.canceled || result.filePaths.length === 0) {
+            return { canceled: true };
+        }
+
+        const sourceFile = result.filePaths[0];
+        const fileName = path.basename(sourceFile);
+        const songsDir = path.join(process.cwd(), 'songs');
+        
+        // Tạo thư mục songs nếu chưa tồn tại
+        if (!fs.existsSync(songsDir)) {
+            fs.mkdirSync(songsDir, { recursive: true });
+        }
+
+        const destFile = path.join(songsDir, fileName);
+
+        // Copy file vào thư mục songs
+        fs.copyFileSync(sourceFile, destFile);
+
+        console.log(`Imported file: ${fileName}`);
+
+        // Đọc và parse file vừa import
+        const content = readFileWithEncoding(destFile);
+        const jsonData = JSON.parse(content);
+
+        return {
+            success: true,
+            fileName: fileName,
+            songData: Array.isArray(jsonData) ? jsonData[0] : jsonData
+        };
+    } catch (err) {
+        console.error('Error importing song file:', err);
         return { error: err.message };
     }
 });
