@@ -2,7 +2,7 @@ import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
 
 export default function Store() {
-    const { songs } = useApp();
+    const { songs, playSong } = useApp();
 
     return (
         <div id="view-store" className="content-view active">
@@ -11,7 +11,12 @@ export default function Store() {
 
             <div id="storeList" className="song-grid">
                 {Object.keys(songs).map((key) => (
-                    <SongCard key={key} song={songs[key]} songKey={key} />
+                    <SongCard
+                        key={key}
+                        song={songs[key]}
+                        songKey={key}
+                        onPlay={() => playSong(key)}
+                    />
                 ))}
             </div>
         </div>

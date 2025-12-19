@@ -1,16 +1,15 @@
 import { useApp } from '../contexts/AppContext';
 import './SongCard.css';
 
-export default function SongCard({ song, songKey }) {
-    const { selectSong, buySong } = useApp();
+export default function SongCard({ song, songKey, onPlay }) {
+    const { buySong } = useApp();
 
     const handleClick = () => {
         if (song.isOwned) {
-            selectSong({
-                title: song.name,
-                artist: song.author,
-                songNotes: song.songNotes
-            });
+            // Gọi hàm onPlay được truyền từ parent component
+            if (onPlay) {
+                onPlay();
+            }
         } else {
             buySong(songKey, song.price);
         }

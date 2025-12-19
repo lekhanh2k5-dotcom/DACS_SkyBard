@@ -59,10 +59,10 @@ export default function PlayerBar() {
                 <div className="song-thumbnail">🎵</div>
                 <div className="song-details">
                     <div className="song-title" id="statusTitle">
-                        {currentSong ? currentSong.title : 'Chưa chọn bài'}
+                        {currentSong ? currentSong.name : 'Chưa chọn bài'}
                     </div>
                     <div className="song-artist" id="statusSub">
-                        {currentSong ? currentSong.artist : 'Chọn bài hát để bắt đầu'}
+                        {currentSong ? currentSong.author : 'Chọn bài hát để bắt đầu'}
                     </div>
                 </div>
             </div>

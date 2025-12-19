@@ -1,8 +1,10 @@
+import React from 'react';
 import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
 
 export default function Library() {
-    const { songs, activeLibraryTab, setActiveLibraryTab } = useApp();
+    // Lấy hàm playSong từ Context
+    const { songs, activeLibraryTab, setActiveLibraryTab, playSong } = useApp();
 
     const ownedSongs = Object.keys(songs)
         .filter(key => songs[key].isOwned)
@@ -39,7 +41,13 @@ export default function Library() {
             <div id="libList" className="song-grid">
                 {Object.keys(displaySongs).length > 0 ? (
                     Object.keys(displaySongs).map((key) => (
-                        <SongCard key={key} song={displaySongs[key]} songKey={key} />
+                        <SongCard
+                            key={key}
+                            song={displaySongs[key]}
+                            songKey={key}
+                            // --- GỌI HÀM playSong TỪ CONTEXT ---
+                            onPlay={() => playSong(key)}
+                        />
                     ))
                 ) : (
                     <p style={{ color: 'var(--text-sub)', padding: '20px' }}>

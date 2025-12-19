@@ -76,3 +76,73 @@ ipcMain.on('stop-music', () => {
         currentProcess = null;
     }
 });
+
+// Đăng ký hàm đọc file nhạc
+ipcMain.handle('read-song-file', async (event, fileName) => {
+    try {
+        // Xác định đường dẫn file. 
+        // process.cwd() trỏ về thư mục gốc dự án khi chạy dev
+        const filePath = path.join(process.cwd(), 'songs', fileName);
+
+        // Đọc file
+        if (fs.existsSync(filePath)) {
+            const content = fs.readFileSync(filePath, 'utf-8');
+            return JSON.parse(content); // Trả về object JSON cho React
+        } else {
+            return { error: 'File not found' };
+        }
+    } catch (err) {
+        console.error(err);
+        return { error: err.message };
+    }
+});
+
+// Hàm quét tất cả file .txt trong thư mục songs
+ipcMain.handle('get-all-songs', async () => {
+    try {
+        const songsDir = path.join(process.cwd(), 'songs');
+
+        // Kiểm tra thư mục có tồn tại không
+        if (!fs.existsSync(songsDir)) {
+            return { error: 'Songs directory not found' };
+        }
+
+        // Đọc tất cả file trong thư mục
+        const files = fs.readdirSync(songsDir);
+
+        // Lọc chỉ lấy file .txt
+        const txtFiles = files.filter(file => file.endsWith('.txt'));
+
+        // Đọc nội dung từng file
+        const songsData = [];
+        for (const file of txtFiles) {
+            try {
+                const filePath = path.join(songsDir, file);
+                const content = fs.readFileSync(filePath, 'utf-8');
+                const jsonData = JSON.parse(content);
+
+                // Thêm filename vào data để sau này dễ xử lý
+                if (Array.isArray(jsonData)) {
+                    jsonData.forEach(song => {
+                        songsData.push({
+                            ...song,
+                            fileName: file
+                        });
+                    });
+                } else {
+                    songsData.push({
+                        ...jsonData,
+                        fileName: file
+                    });
+                }
+            } catch (err) {
+                console.error(`Error reading file ${file}:`, err);
+            }
+        }
+
+        return songsData;
+    } catch (err) {
+        console.error('Error scanning songs directory:', err);
+        return { error: err.message };
+    }
+});

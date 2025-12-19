@@ -1,27 +1,86 @@
-# Dependencies
+# Dependencies (773 MB)
 node_modules/
 
 # Build outputs
 dist/
 dist-electron/
+out/
+
+# Release builds (425 MB - file .exe và unpacked)
 release/
+*.exe
+*.dmg
+*.AppImage
+*.snap
+*.deb
+*.rpm
+*.blockmap
 
 # OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
 
 # IDE
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
 
 # Logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
 
 # Environment variables
 .env
 .env.local
+.env.*.local
+.env.development
 .env.production
+.env.test
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.parcel-cache/
+.vite/
+
+# Test coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Package manager lock files (giữ package-lock.json nếu dùng npm)
+# yarn.lock
+# pnpm-lock.yaml
+
+# System and backup files
+*.bak
+*.backup
+*.old
