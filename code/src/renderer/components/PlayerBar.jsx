@@ -7,11 +7,37 @@ export default function PlayerBar() {
         isPlaying,
         playbackMode,
         playbackSpeed,
+        currentTime,
+        duration,
         setPlaybackMode,
         setPlaybackSpeed,
         togglePlayback,
+        seekTo,
         importSongFile
     } = useApp();
+
+    // Format time từ ms sang mm:ss
+    const formatTime = (ms) => {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    // Handle click vào progress bar để tua
+    const handleProgressClick = (e) => {
+        if (!currentSong || !duration) return;
+
+        const progressBar = e.currentTarget;
+        const rect = progressBar.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percentage = clickX / rect.width;
+        const newTime = percentage * duration;
+
+        seekTo(Math.max(0, Math.min(newTime, duration)));
+    };
+
+    const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
 
     const playbackModes = ['once', 'sequence', 'shuffle', 'repeat-one'];
     const modeNames = {
@@ -119,17 +145,17 @@ export default function PlayerBar() {
                 </div>
 
                 <div className="progress-section">
-                    <span className="time-current">0:00</span>
-                    <div className="progress-container">
-                        <div className="progress-bar" style={{ width: '0%' }}></div>
+                    <span className="time-current">{formatTime(currentTime)}</span>
+                    <div className="progress-container" onClick={handleProgressClick} style={{ cursor: 'pointer' }}>
+                        <div className="progress-bar" style={{ width: `${progressPercentage}%` }}></div>
                     </div>
-                    <span className="time-total">0:00</span>
+                    <span className="time-total">{formatTime(duration)}</span>
                 </div>
             </div>
 
             <div className="player-right">
-                <button 
-                    className="btn-add" 
+                <button
+                    className="btn-add"
                     title="Import file nhạc từ máy tính"
                     onClick={importSongFile}
                 >

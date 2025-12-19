@@ -19,6 +19,9 @@ export const AppProvider = ({ children }) => {
   const [activeLibraryTab, setActiveLibraryTab] = useState('all');
   const [playbackMode, setPlaybackMode] = useState('once');
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+  const [currentTime, setCurrentTime] = useState(0); // Thời gian hiện tại (ms)
+  const [duration, setDuration] = useState(0); // Tổng thời gian bài hát (ms)
+  const [startTime, setStartTime] = useState(0); // Thời điểm bắt đầu phát
 
   // Load tất cả bài hát từ thư mục songs khi khởi động
   useEffect(() => {
@@ -111,12 +114,18 @@ export const AppProvider = ({ children }) => {
         setCurrentSong(fullSongData);
         setIsPlaying(false); // Đặt về trạng thái dừng
 
+        // Tính tổng thời gian bài hát (lấy time của note cuối cùng)
+        const lastNote = fullSongData.songNotes[fullSongData.songNotes.length - 1];
+        const totalDuration = lastNote ? lastNote.time + 1000 : 0; // +1s buffer
+        setDuration(totalDuration);
+        setCurrentTime(0);
+
         // Dừng nhạc đang phát (nếu có)
         if (window.api) {
           window.api.stopMusic();
         }
 
-        console.log(`Đã chọn bài: ${fullSongData.name}`);
+        console.log(`Đã chọn bài: ${fullSongData.name}, Duration: ${totalDuration}ms`);
       } else {
         alert('Bài hát này chưa có nốt nhạc!');
       }
@@ -126,6 +135,37 @@ export const AppProvider = ({ children }) => {
       alert('Có lỗi xảy ra khi chọn bài hát!');
     }
   };
+
+  // useEffect để cập nhật thời gian khi đang phát
+  useEffect(() => {
+    let interval;
+
+    if (isPlaying && currentSong) {
+      // Lưu thời điểm bắt đầu
+      const playStartTime = Date.now();
+      const initialTime = currentTime;
+
+      interval = setInterval(() => {
+        const elapsed = Date.now() - playStartTime;
+        const newTime = initialTime + elapsed;
+
+        if (newTime >= duration) {
+          // Hết bài
+          setCurrentTime(duration);
+          setIsPlaying(false);
+          if (window.api) {
+            window.api.stopMusic();
+          }
+        } else {
+          setCurrentTime(newTime);
+        }
+      }, 100); // Update mỗi 100ms
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPlaying, currentSong, duration]);
 
   const togglePlayback = () => {
     if (!currentSong) {
@@ -137,10 +177,20 @@ export const AppProvider = ({ children }) => {
     setIsPlaying(newPlayingState);
 
     if (newPlayingState) {
-      // Phát nhạc
+      // Phát nhạc từ vị trí hiện tại
       if (window.api && currentSong.songNotes) {
-        console.log(`Bắt đầu phát: ${currentSong.name}`);
-        window.api.playOnline(currentSong.songNotes);
+        console.log(`Bắt đầu phát: ${currentSong.name} từ ${currentTime}ms`);
+
+        // Lọc notes từ thời điểm hiện tại
+        const notesToPlay = currentSong.songNotes
+          .filter(note => note.time >= currentTime)
+          .map(note => ({
+            ...note,
+            time: note.time - currentTime // Adjust time relative to current position
+          }));
+
+        window.api.playOnline(notesToPlay);
+        setStartTime(Date.now());
       }
     } else {
       // Dừng phát
@@ -148,6 +198,27 @@ export const AppProvider = ({ children }) => {
         console.log('Dừng phát nhạc');
         window.api.stopMusic();
       }
+    }
+  };
+
+  // Hàm tua đến vị trí cụ thể
+  const seekTo = (timeMs) => {
+    setCurrentTime(timeMs);
+
+    if (isPlaying && window.api && currentSong) {
+      // Nếu đang phát, dừng và phát lại từ vị trí mới
+      window.api.stopMusic();
+
+      const notesToPlay = currentSong.songNotes
+        .filter(note => note.time >= timeMs)
+        .map(note => ({
+          ...note,
+          time: note.time - timeMs
+        }));
+
+      setTimeout(() => {
+        window.api.playOnline(notesToPlay);
+      }, 100);
     }
   };
 
@@ -231,12 +302,15 @@ export const AppProvider = ({ children }) => {
     activeLibraryTab,
     playbackMode,
     playbackSpeed,
+    currentTime,     // Thời gian hiện tại
+    duration,        // Tổng thời gian
     setActiveTab,
     setActiveLibraryTab,
     setPlaybackMode,
     setPlaybackSpeed,
     selectSong,      // Hàm chọn bài (không phát)
     togglePlayback,  // Hàm phát/dừng
+    seekTo,          // Hàm tua
     buySong,
     toggleFavorite,
     importSongFile,  // Hàm import file nhạc

@@ -9,6 +9,6 @@ contextBridge.exposeInMainWorld('api', {
     readSong: (fileName) => ipcRenderer.invoke('read-song-file', fileName),
 
     getAllSongs: () => ipcRenderer.invoke('get-all-songs'),
-    
+
     importSongFile: () => ipcRenderer.invoke('import-song-file')
 });

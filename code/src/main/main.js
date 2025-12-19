@@ -203,7 +203,7 @@ ipcMain.handle('import-song-file', async () => {
         const sourceFile = result.filePaths[0];
         const fileName = path.basename(sourceFile);
         const songsDir = path.join(process.cwd(), 'songs');
-        
+
         // Tạo thư mục songs nếu chưa tồn tại
         if (!fs.existsSync(songsDir)) {
             fs.mkdirSync(songsDir, { recursive: true });
