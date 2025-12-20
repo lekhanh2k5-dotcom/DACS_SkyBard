@@ -50,24 +50,45 @@ public class Inputs {
 "@
 Add-Type -TypeDefinition $code
 Start-Sleep -Seconds 2
+[Console]::WriteLine("MUSIC_READY")
+$startTime = [DateTime]::Now
 `;
-    let previousTime = 0;
     notes.forEach(note => {
         const scanCode = scanCodeMap[note.key];
         if (scanCode) {
-            let delay = note.time - previousTime;
-            if (delay > 20) delay -= 20; else delay = 0;
-            if (delay > 0) psScript += `Start-Sleep -Milliseconds ${Math.floor(delay)}\n`;
-            psScript += `[Inputs]::keybd_event(0, [byte]${scanCode}, 0x0008, 0);\n`;
-            psScript += `Start-Sleep -Milliseconds 20;\n`;
-            psScript += `[Inputs]::keybd_event(0, [byte]${scanCode}, 0x000A, 0);\n`;
-            previousTime = note.time;
+            psScript += `
+$targetTime = $startTime.AddMilliseconds(${note.time})
+$now = [DateTime]::Now
+$sleepMs = ($targetTime - $now).TotalMilliseconds
+if ($sleepMs -gt 0) { Start-Sleep -Milliseconds $sleepMs }
+[Inputs]::keybd_event(0, [byte]${scanCode}, 0x0008, 0)
+Start-Sleep -Milliseconds 20
+[Inputs]::keybd_event(0, [byte]${scanCode}, 0x000A, 0)
+`;
         }
     });
 
     const tempPath = path.join(app.getPath('temp'), 'sky_run.ps1');
     fs.writeFileSync(tempPath, psScript);
-    currentProcess = spawn('powershell', ['-ExecutionPolicy', 'Bypass', '-File', tempPath]);
+
+    currentProcess = spawn('powershell', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', tempPath]);
+
+    currentProcess.stdout.on('data', (data) => {
+        const output = data.toString().trim();
+        if (output.includes('MUSIC_READY')) {
+            console.log('🎵 PowerShell sẵn sàng');
+            if (mainWindow && mainWindow.webContents) {
+                mainWindow.webContents.send('music-ready');
+            }
+        }
+    });
+
+    currentProcess.stderr.on('data', (data) => {
+        const errOutput = data.toString();
+        if (!errOutput.includes('Add-Type')) {
+            console.error('PowerShell error:', errOutput);
+        }
+    });
 });
 
 ipcMain.on('stop-music', () => {
@@ -130,19 +151,19 @@ ipcMain.handle('read-song-file', async (event, fileName) => {
 ipcMain.handle('get-all-songs', async () => {
     try {
         const songsData = [];
-        
+
         // 1. Đọc từ thư mục app bundle (songs/ trong app)
         const appSongsDir = path.join(process.cwd(), 'songs');
         if (fs.existsSync(appSongsDir)) {
             const appFiles = fs.readdirSync(appSongsDir).filter(f => f.endsWith('.txt'));
             console.log(`📦 Found ${appFiles.length} songs in app bundle`);
-            
+
             for (const file of appFiles) {
                 try {
                     const filePath = path.join(appSongsDir, file);
                     const content = readFileWithEncoding(filePath);
                     const jsonData = JSON.parse(content);
-                    
+
                     if (Array.isArray(jsonData)) {
                         jsonData.forEach(song => songsData.push({ ...song, fileName: file, isFromBundle: true }));
                     } else {
@@ -153,20 +174,20 @@ ipcMain.handle('get-all-songs', async () => {
                 }
             }
         }
-        
+
         // 2. Đọc từ userData (file user import)
         const userDataPath = app.getPath('userData');
         const userSongsDir = path.join(userDataPath, 'songs');
         if (fs.existsSync(userSongsDir)) {
             const userFiles = fs.readdirSync(userSongsDir).filter(f => f.endsWith('.txt'));
             console.log(`👤 Found ${userFiles.length} songs in userData`);
-            
+
             for (const file of userFiles) {
                 try {
                     const filePath = path.join(userSongsDir, file);
                     const content = readFileWithEncoding(filePath);
                     const jsonData = JSON.parse(content);
-                    
+
                     if (Array.isArray(jsonData)) {
                         jsonData.forEach(song => songsData.push({ ...song, fileName: file, isFromUser: true }));
                     } else {
@@ -203,7 +224,7 @@ ipcMain.handle('import-song-file', async () => {
 
         const sourceFile = result.filePaths[0];
         const fileName = path.basename(sourceFile);
-        
+
         // Lưu vào userData (writable) thay vì thư mục app
         const userDataPath = app.getPath('userData');
         const songsDir = path.join(userDataPath, 'songs');

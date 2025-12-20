@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { mockSongs } from '../data/songs';
 import { fetchSongsFromFirebase, listenToSongs } from '../../services/firebaseService';
 
@@ -24,6 +24,19 @@ export const AppProvider = ({ children }) => {
   const [currentTime, setCurrentTime] = useState(0); // Thời gian hiện tại (ms)
   const [duration, setDuration] = useState(0); // Tổng thời gian bài hát (ms)
   const [startTime, setStartTime] = useState(0); // Thời điểm bắt đầu phát
+  const progressStartTimeRef = useRef(0);
+  const progressInitialTimeRef = useRef(0);
+  const [isMusicReady, setIsMusicReady] = useState(false);
+
+  useEffect(() => {
+    if (window.api && window.api.onMusicReady) {
+      window.api.onMusicReady(() => {
+        console.log('🎵 Nhạc đã bắt đầu - bật thanh tiến trình!');
+        progressStartTimeRef.current = Date.now();
+        setIsMusicReady(true);
+      });
+    }
+  }, []);
 
   // Load bài hát từ 3 nguồn: mockSongs + local files + Firebase
   useEffect(() => {
@@ -209,39 +222,35 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     let interval;
 
-    if (isPlaying && currentSong) {
-      // Lưu thời điểm bắt đầu
-      const playStartTime = Date.now();
-      const initialTime = currentTime;
-
+    if (isPlaying && isMusicReady && currentSong) {
       interval = setInterval(() => {
-        const elapsed = Date.now() - playStartTime;
-        // Áp dụng playbackSpeed vào thời gian
-        const newTime = initialTime + (elapsed * playbackSpeed);
+        const elapsed = Date.now() - progressStartTimeRef.current;
+        const newTime = progressInitialTimeRef.current + (elapsed * playbackSpeed);
 
         if (newTime >= duration) {
-          // Hết bài
           setCurrentTime(duration);
           setIsPlaying(false);
+          setIsMusicReady(false);
           if (window.api) {
             window.api.stopMusic();
           }
         } else {
           setCurrentTime(newTime);
         }
-      }, 100); // Update mỗi 100ms
+      }, 100);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isPlaying, currentSong, duration, playbackSpeed]);
+  }, [isPlaying, isMusicReady, currentSong, duration, playbackSpeed]);
 
   // useEffect để phát lại với tốc độ mới khi thay đổi speed trong khi đang phát
   useEffect(() => {
     if (isPlaying && currentSong && window.api) {
-      // Dừng và phát lại với tốc độ mới
+      setIsMusicReady(false);
       window.api.stopMusic();
+      progressInitialTimeRef.current = currentTime;
 
       const notesToPlay = currentSong.songNotes
         .filter(note => note.time >= currentTime)
@@ -266,23 +275,24 @@ export const AppProvider = ({ children }) => {
     setIsPlaying(newPlayingState);
 
     if (newPlayingState) {
-      // Phát nhạc từ vị trí hiện tại
+      setIsMusicReady(false);
+      progressInitialTimeRef.current = currentTime;
+
       if (window.api && currentSong.songNotes) {
         console.log(`Bắt đầu phát: ${currentSong.name} từ ${currentTime}ms với tốc độ ${playbackSpeed}x`);
 
-        // Lọc notes từ thời điểm hiện tại và áp dụng tốc độ
         const notesToPlay = currentSong.songNotes
           .filter(note => note.time >= currentTime)
           .map(note => ({
             ...note,
-            time: (note.time - currentTime) / playbackSpeed // Adjust time với speed
+            time: (note.time - currentTime) / playbackSpeed
           }));
 
         window.api.playOnline(notesToPlay);
         setStartTime(Date.now());
       }
     } else {
-      // Dừng phát
+      setIsMusicReady(false);
       if (window.api) {
         console.log('Dừng phát nhạc');
         window.api.stopMusic();
@@ -295,14 +305,15 @@ export const AppProvider = ({ children }) => {
     setCurrentTime(timeMs);
 
     if (isPlaying && window.api && currentSong) {
-      // Nếu đang phát, dừng và phát lại từ vị trí mới
+      setIsMusicReady(false);
       window.api.stopMusic();
+      progressInitialTimeRef.current = timeMs;
 
       const notesToPlay = currentSong.songNotes
         .filter(note => note.time >= timeMs)
         .map(note => ({
           ...note,
-          time: (note.time - timeMs) / playbackSpeed // Áp dụng speed khi tua
+          time: (note.time - timeMs) / playbackSpeed
         }));
 
       setTimeout(() => {
