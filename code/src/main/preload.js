@@ -10,5 +10,7 @@ contextBridge.exposeInMainWorld('api', {
 
     getAllSongs: () => ipcRenderer.invoke('get-all-songs'),
 
-    importSongFile: () => ipcRenderer.invoke('import-song-file')
+    importSongFile: () => ipcRenderer.invoke('import-song-file'),
+
+    fetchUrl: (url) => ipcRenderer.invoke('fetch-url', url)
 });

@@ -49,22 +49,4 @@ export const mockSongs = {
             { "time": 31185, "key": "1Key0" }, { "time": 31290, "key": "1Key2" }, { "time": 31395, "key": "1Key4" }, { "time": 31500, "key": "1Key7" }
         ]
     },
-    "song_2": {
-        name: "Nấu ăn cho em",
-        author: "Đen Vâu",
-        composer: "Admin",
-        price: 0,
-        isOwned: true,
-        isFavorite: false,
-        songNotes: []
-    },
-    "song_3": {
-        name: "Cắt đôi nỗi sầu",
-        author: "Tăng Duy Tân",
-        composer: "SkyFan",
-        price: 200,
-        isOwned: false,
-        isFavorite: false,
-        songNotes: []
-    }
 };

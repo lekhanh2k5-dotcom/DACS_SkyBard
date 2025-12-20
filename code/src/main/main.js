@@ -129,58 +129,59 @@ ipcMain.handle('read-song-file', async (event, fileName) => {
 // Hàm quét tất cả file .txt trong thư mục songs
 ipcMain.handle('get-all-songs', async () => {
     try {
-        const songsDir = path.join(process.cwd(), 'songs');
-
-        // Kiểm tra thư mục có tồn tại không
-        if (!fs.existsSync(songsDir)) {
-            return { error: 'Songs directory not found' };
-        }
-
-        // Đọc tất cả file trong thư mục
-        const files = fs.readdirSync(songsDir);
-
-        // Lọc chỉ lấy file .txt
-        const txtFiles = files.filter(file => file.endsWith('.txt'));
-
-        // Đọc nội dung từng file
         const songsData = [];
-        console.log(`Found ${txtFiles.length} .txt files in songs directory`);
-
-        for (const file of txtFiles) {
-            try {
-                const filePath = path.join(songsDir, file);
-                console.log(`Reading file: ${file}`);
-
-                const content = readFileWithEncoding(filePath);
-                console.log(`Content length for ${file}: ${content.length} characters`);
-
-                const jsonData = JSON.parse(content);
-                console.log(`Successfully parsed ${file}: ${jsonData.name || 'unnamed'}`);
-
-                // Thêm filename vào data để sau này dễ xử lý
-                if (Array.isArray(jsonData)) {
-                    jsonData.forEach(song => {
-                        songsData.push({
-                            ...song,
-                            fileName: file
-                        });
-                    });
-                } else {
-                    songsData.push({
-                        ...jsonData,
-                        fileName: file
-                    });
+        
+        // 1. Đọc từ thư mục app bundle (songs/ trong app)
+        const appSongsDir = path.join(process.cwd(), 'songs');
+        if (fs.existsSync(appSongsDir)) {
+            const appFiles = fs.readdirSync(appSongsDir).filter(f => f.endsWith('.txt'));
+            console.log(`📦 Found ${appFiles.length} songs in app bundle`);
+            
+            for (const file of appFiles) {
+                try {
+                    const filePath = path.join(appSongsDir, file);
+                    const content = readFileWithEncoding(filePath);
+                    const jsonData = JSON.parse(content);
+                    
+                    if (Array.isArray(jsonData)) {
+                        jsonData.forEach(song => songsData.push({ ...song, fileName: file, isFromBundle: true }));
+                    } else {
+                        songsData.push({ ...jsonData, fileName: file, isFromBundle: true });
+                    }
+                } catch (err) {
+                    console.error(`Error reading ${file}:`, err.message);
                 }
-            } catch (err) {
-                console.error(`❌ Error reading file ${file}:`, err.message);
-                console.error(`Stack:`, err.stack);
+            }
+        }
+        
+        // 2. Đọc từ userData (file user import)
+        const userDataPath = app.getPath('userData');
+        const userSongsDir = path.join(userDataPath, 'songs');
+        if (fs.existsSync(userSongsDir)) {
+            const userFiles = fs.readdirSync(userSongsDir).filter(f => f.endsWith('.txt'));
+            console.log(`👤 Found ${userFiles.length} songs in userData`);
+            
+            for (const file of userFiles) {
+                try {
+                    const filePath = path.join(userSongsDir, file);
+                    const content = readFileWithEncoding(filePath);
+                    const jsonData = JSON.parse(content);
+                    
+                    if (Array.isArray(jsonData)) {
+                        jsonData.forEach(song => songsData.push({ ...song, fileName: file, isFromUser: true }));
+                    } else {
+                        songsData.push({ ...jsonData, fileName: file, isFromUser: true });
+                    }
+                } catch (err) {
+                    console.error(`Error reading user file ${file}:`, err.message);
+                }
             }
         }
 
-        console.log(`Total songs loaded: ${songsData.length}`);
+        console.log(`🎵 Total songs loaded: ${songsData.length}`);
         return songsData;
     } catch (err) {
-        console.error('Error scanning songs directory:', err);
+        console.error('Error scanning songs:', err);
         return { error: err.message };
     }
 });
@@ -202,9 +203,12 @@ ipcMain.handle('import-song-file', async () => {
 
         const sourceFile = result.filePaths[0];
         const fileName = path.basename(sourceFile);
-        const songsDir = path.join(process.cwd(), 'songs');
+        
+        // Lưu vào userData (writable) thay vì thư mục app
+        const userDataPath = app.getPath('userData');
+        const songsDir = path.join(userDataPath, 'songs');
 
-        // Tạo thư mục songs nếu chưa tồn tại
+        // Tạo thư mục songs trong userData nếu chưa tồn tại
         if (!fs.existsSync(songsDir)) {
             fs.mkdirSync(songsDir, { recursive: true });
         }
@@ -227,6 +231,66 @@ ipcMain.handle('import-song-file', async () => {
         };
     } catch (err) {
         console.error('Error importing song file:', err);
+        return { error: err.message };
+    }
+});
+
+// Fetch file từ URL (bypass CORS)
+ipcMain.handle('fetch-url', async (event, url) => {
+    try {
+        console.log('Main process fetching:', url);
+        const https = require('https');
+        const http = require('http');
+
+        return new Promise((resolve, reject) => {
+            const protocol = url.startsWith('https') ? https : http;
+
+            protocol.get(url, (res) => {
+                const chunks = [];
+
+                res.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+
+                res.on('end', () => {
+                    // Ghép buffer
+                    const buffer = Buffer.concat(chunks);
+
+                    // Xử lý encoding và BOM
+                    let data = '';
+
+                    // Check UTF-16 LE BOM
+                    if (buffer[0] === 0xFF && buffer[1] === 0xFE) {
+                        data = buffer.slice(2).toString('utf16le');
+                    }
+                    // Check UTF-16 BE BOM
+                    else if (buffer[0] === 0xFE && buffer[1] === 0xFF) {
+                        data = buffer.slice(2).toString('utf16be');
+                    }
+                    // Check UTF-8 BOM
+                    else if (buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+                        data = buffer.slice(3).toString('utf-8');
+                    }
+                    // No BOM - default UTF-8
+                    else {
+                        data = buffer.toString('utf-8');
+                    }
+
+                    // Remove BOM character nếu vẫn còn
+                    if (data.charCodeAt(0) === 0xFEFF) {
+                        data = data.slice(1);
+                    }
+
+                    console.log('Fetched data length:', data.length);
+                    resolve({ success: true, data });
+                });
+            }).on('error', (err) => {
+                console.error('Fetch error:', err);
+                reject({ error: err.message });
+            });
+        });
+    } catch (err) {
+        console.error('Error in fetch-url:', err);
         return { error: err.message };
     }
 });

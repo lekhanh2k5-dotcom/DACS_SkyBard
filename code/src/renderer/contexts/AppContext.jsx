@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { mockSongs } from '../data/songs';
+import { fetchSongsFromFirebase, listenToSongs } from '../../services/firebaseService';
 
 const AppContext = createContext();
 
@@ -12,7 +13,8 @@ export const useApp = () => {
 };
 
 export const AppProvider = ({ children }) => {
-  const [songs, setSongs] = useState(mockSongs);
+  const [songs, setSongs] = useState({});
+  const [loading, setLoading] = useState(true);
   const [currentSong, setCurrentSong] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeTab, setActiveTab] = useState('store');
@@ -23,45 +25,112 @@ export const AppProvider = ({ children }) => {
   const [duration, setDuration] = useState(0); // Tổng thời gian bài hát (ms)
   const [startTime, setStartTime] = useState(0); // Thời điểm bắt đầu phát
 
-  // Load tất cả bài hát từ thư mục songs khi khởi động
+  // Load bài hát từ 3 nguồn: mockSongs + local files + Firebase
   useEffect(() => {
-    const loadSongsFromFiles = async () => {
-      if (window.api && window.api.getAllSongs) {
-        try {
-          const songsFromFiles = await window.api.getAllSongs();
+    const loadAllSongs = async () => {
+      try {
+        setLoading(true);
+        console.log('🚀 Bắt đầu load songs...');
+        let allSongs = { ...mockSongs }; // Bắt đầu với mockSongs
+        console.log('✅ mockSongs loaded:', Object.keys(mockSongs).length);
 
-          if (songsFromFiles && !songsFromFiles.error && Array.isArray(songsFromFiles)) {
-            // Chuyển đổi array thành object với key
-            const newSongs = {};
-            let songIndex = Object.keys(mockSongs).length + 1;
+        // 1. Load từ file local (nếu có window.api)
+        if (window.api && window.api.getAllSongs) {
+          try {
+            console.log('📂 Đang load từ file local...');
+            const localSongs = await window.api.getAllSongs();
 
-            songsFromFiles.forEach((song, index) => {
-              const songKey = `song_file_${songIndex++}`;
-              newSongs[songKey] = {
-                name: song.name || 'Unknown',
-                author: song.author || 'Unknown',
-                composer: song.transcribedBy || 'Unknown',
-                fileName: song.fileName, // Lưu tên file để đọc sau
-                price: 0,
-                isOwned: true, // Tất cả bài từ file đều được sở hữu
-                isFavorite: false,
-                songNotes: song.songNotes || [],
-                bpm: song.bpm,
-                isFromFile: true // Đánh dấu đây là bài từ file
-              };
-            });
-
-            // Merge với mockSongs
-            setSongs(prev => ({ ...prev, ...newSongs }));
-            console.log(`Đã load ${songsFromFiles.length} bài hát từ thư mục songs`);
+            if (localSongs && !localSongs.error && Array.isArray(localSongs)) {
+              let songIndex = Object.keys(allSongs).length + 1;
+              localSongs.forEach((song) => {
+                const songKey = `song_local_${songIndex++}`;
+                allSongs[songKey] = {
+                  name: song.name || 'Unknown',
+                  author: song.author || 'Unknown',
+                  composer: song.transcribedBy || 'Unknown',
+                  fileName: song.fileName,
+                  price: 0,
+                  isOwned: true,
+                  isFavorite: false,
+                  songNotes: song.songNotes || [],
+                  bpm: song.bpm,
+                  isFromFile: true
+                };
+              });
+              console.log(`✅ Đã load ${localSongs.length} bài từ file local`);
+            }
+          } catch (error) {
+            console.error('⚠️ Lỗi khi load file local:', error);
           }
-        } catch (error) {
-          console.error('Error loading songs from files:', error);
         }
+
+        // 2. Load từ Firebase (KHÔNG block render nếu lỗi)
+        fetchSongsFromFirebase()
+          .then(firebaseSongs => {
+            if (firebaseSongs && firebaseSongs.length > 0) {
+              setSongs(prev => {
+                const updated = { ...prev };
+                firebaseSongs.forEach(song => {
+                  updated[`firebase_${song.id}`] = {
+                    ...song,
+                    isFromFirebase: true
+                  };
+                });
+                console.log(`✅ Đã load ${firebaseSongs.length} bài từ Firebase`);
+                return updated;
+              });
+            } else {
+              console.log('⚠️ Firebase trống hoặc chưa có dữ liệu');
+            }
+          })
+          .catch(error => {
+            console.error('⚠️ Lỗi khi load Firebase:', error);
+          });
+
+        setSongs(allSongs);
+        console.log(`🎵 Tổng cộng: ${Object.keys(allSongs).length} bài hát`);
+      } catch (error) {
+        console.error('❌ Lỗi khi load songs:', error);
+        setSongs(mockSongs); // Fallback
+      } finally {
+        setLoading(false);
       }
     };
 
-    loadSongsFromFiles();
+    loadAllSongs();
+
+    // Setup realtime listener cho Firebase (optional) - KHÔNG block
+    try {
+      const unsubscribe = listenToSongs((updatedFirebaseSongs) => {
+        setSongs(prev => {
+          const newSongs = { ...prev };
+
+          // Xóa các bài Firebase cũ
+          Object.keys(newSongs).forEach(key => {
+            if (key.startsWith('firebase_')) {
+              delete newSongs[key];
+            }
+          });
+
+          // Thêm bài Firebase mới
+          updatedFirebaseSongs.forEach(song => {
+            newSongs[`firebase_${song.id}`] = {
+              ...song,
+              isFromFirebase: true
+            };
+          });
+
+          console.log('🔄 Firebase realtime update');
+          return newSongs;
+        });
+      });
+
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
+    } catch (error) {
+      console.error('⚠️ Không thể setup Firebase listener:', error);
+    }
   }, []);
 
   // --- HÀM CHỌN BÀI HÁT: Chỉ load và set currentSong, không phát ---
@@ -147,7 +216,8 @@ export const AppProvider = ({ children }) => {
 
       interval = setInterval(() => {
         const elapsed = Date.now() - playStartTime;
-        const newTime = initialTime + elapsed;
+        // Áp dụng playbackSpeed vào thời gian
+        const newTime = initialTime + (elapsed * playbackSpeed);
 
         if (newTime >= duration) {
           // Hết bài
@@ -165,7 +235,26 @@ export const AppProvider = ({ children }) => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isPlaying, currentSong, duration]);
+  }, [isPlaying, currentSong, duration, playbackSpeed]);
+
+  // useEffect để phát lại với tốc độ mới khi thay đổi speed trong khi đang phát
+  useEffect(() => {
+    if (isPlaying && currentSong && window.api) {
+      // Dừng và phát lại với tốc độ mới
+      window.api.stopMusic();
+
+      const notesToPlay = currentSong.songNotes
+        .filter(note => note.time >= currentTime)
+        .map(note => ({
+          ...note,
+          time: (note.time - currentTime) / playbackSpeed
+        }));
+
+      setTimeout(() => {
+        window.api.playOnline(notesToPlay);
+      }, 50);
+    }
+  }, [playbackSpeed]); // Chỉ trigger khi thay đổi playbackSpeed
 
   const togglePlayback = () => {
     if (!currentSong) {
@@ -179,14 +268,14 @@ export const AppProvider = ({ children }) => {
     if (newPlayingState) {
       // Phát nhạc từ vị trí hiện tại
       if (window.api && currentSong.songNotes) {
-        console.log(`Bắt đầu phát: ${currentSong.name} từ ${currentTime}ms`);
+        console.log(`Bắt đầu phát: ${currentSong.name} từ ${currentTime}ms với tốc độ ${playbackSpeed}x`);
 
-        // Lọc notes từ thời điểm hiện tại
+        // Lọc notes từ thời điểm hiện tại và áp dụng tốc độ
         const notesToPlay = currentSong.songNotes
           .filter(note => note.time >= currentTime)
           .map(note => ({
             ...note,
-            time: note.time - currentTime // Adjust time relative to current position
+            time: (note.time - currentTime) / playbackSpeed // Adjust time với speed
           }));
 
         window.api.playOnline(notesToPlay);
@@ -213,7 +302,7 @@ export const AppProvider = ({ children }) => {
         .filter(note => note.time >= timeMs)
         .map(note => ({
           ...note,
-          time: note.time - timeMs
+          time: (note.time - timeMs) / playbackSpeed // Áp dụng speed khi tua
         }));
 
       setTimeout(() => {
@@ -296,6 +385,7 @@ export const AppProvider = ({ children }) => {
 
   const value = {
     songs,
+    loading,         // Thêm loading state
     currentSong,
     isPlaying,
     activeTab,

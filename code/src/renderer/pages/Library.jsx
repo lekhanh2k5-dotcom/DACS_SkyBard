@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
 
 export default function Library() {
-    // Lấy hàm selectSong từ Context
-    const { songs, activeLibraryTab, setActiveLibraryTab, selectSong } = useApp();
+    // Lấy hàm selectSong và importSongFile từ Context
+    const { songs, activeLibraryTab, setActiveLibraryTab, selectSong, importSongFile } = useApp();
+    const [searchQuery, setSearchQuery] = useState('');
 
     const ownedSongs = Object.keys(songs)
         .filter(key => songs[key].isOwned)
@@ -14,12 +15,41 @@ export default function Library() {
         .filter(key => songs[key].isOwned && songs[key].isFavorite)
         .reduce((obj, key) => ({ ...obj, [key]: songs[key] }), {});
 
-    const displaySongs = activeLibraryTab === 'all' ? ownedSongs : favoriteSongs;
+    const baseSongs = activeLibraryTab === 'all' ? ownedSongs : favoriteSongs;
+
+    const displaySongs = Object.keys(baseSongs).filter(key => {
+        const song = baseSongs[key];
+        const query = searchQuery.toLowerCase();
+        return song.name.toLowerCase().includes(query) ||
+            (song.artist && song.artist.toLowerCase().includes(query));
+    }).reduce((obj, key) => ({ ...obj, [key]: baseSongs[key] }), {});
 
     return (
         <div id="view-library" className="content-view active">
-            <h2 className="view-title">📚 Thư viện</h2>
-            <p className="view-subtitle">Các bài hát bạn đã sở hữu</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <div>
+                    <h2 className="view-title">📚 Thư viện</h2>
+                </div>
+                <input
+                    type="text"
+                    placeholder="🔍 Tìm kiếm bài hát..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                        padding: '10px 15px',
+                        borderRadius: '20px',
+                        border: '1px solid var(--border)',
+                        background: 'var(--card-bg)',
+                        color: 'var(--text-main)',
+                        width: '250px',
+                        fontSize: '14px',
+                        outline: 'none',
+                        transition: 'border 0.2s',
+                    }}
+                    onFocus={(e) => e.target.style.border = '1px solid var(--primary)'}
+                    onBlur={(e) => e.target.style.border = '1px solid var(--border)'}
+                />
+            </div>
 
             <div className="library-tabs">
                 <button

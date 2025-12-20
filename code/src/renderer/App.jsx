@@ -6,7 +6,21 @@ import Library from './pages/Library';
 import Settings from './pages/Settings';
 
 function AppContent() {
-    const { activeTab } = useApp();
+    const { activeTab, loading } = useApp();
+
+    if (loading) {
+        return (
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100vh',
+                color: 'white'
+            }}>
+                <h2>Đang tải dữ liệu...</h2>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -26,6 +40,8 @@ function AppContent() {
 }
 
 export default function App() {
+    console.log('🎨 App component rendering...');
+
     return (
         <AppProvider>
             <AppContent />

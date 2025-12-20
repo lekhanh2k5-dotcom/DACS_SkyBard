@@ -1,0 +1,52 @@
+{
+    "songs": {
+        "song1": {
+            "name": "Chờ anh về",
+            "author": "Bray",
+            "composer": "KChip",
+            "price": 10000,
+            "isOwned": false,
+            "isFavorite": false,
+            "bpm": 1161,
+            "txtFilePath": "songs/txt/Chờ anh về.txt",
+            "coverImage": null,
+            "isFromFirebase": true
+        },
+        "song2": {
+            "name": "Hazy moon",
+            "author": "Unknown",
+            "composer": "Unknown",
+            "price": 0,
+            "isOwned": true,
+            "isFavorite": false,
+            "bpm": 120,
+            "txtFilePath": "songs/txt/Hazy moon.txt",
+            "coverImage": null,
+            "isFromFirebase": true
+        },
+        "song3": {
+            "name": "Zoo",
+            "author": "Unknown",
+            "composer": "Unknown",
+            "price": 5000,
+            "isOwned": false,
+            "isFavorite": false,
+            "bpm": 120,
+            "txtFilePath": "songs/txt/Zoo.txt",
+            "coverImage": null,
+            "isFromFirebase": true
+        },
+        "song4": {
+            "name": "All is Found(Frozen 2)",
+            "author": "Disney",
+            "composer": "Unknown",
+            "price": 15000,
+            "isOwned": false,
+            "isFavorite": false,
+            "bpm": 120,
+            "txtFilePath": "songs/txt/All is Found(Frozen 2).txt",
+            "coverImage": null,
+            "isFromFirebase": true
+        }
+    }
+}
