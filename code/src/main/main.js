@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, globalShortcut } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -52,7 +52,41 @@ function createWindow() {
     console.log('Loading from:', path.join(__dirname, '../dist/index.html'));
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+    createWindow();
+
+    // Đăng ký phím tắt toàn cục
+    // Ctrl+Shift+C - Previous
+    globalShortcut.register('CommandOrControl+Shift+C', () => {
+        if (mainWindow && mainWindow.webContents) {
+            mainWindow.webContents.send('shortcut-prev');
+            console.log('⏮️ Shortcut: Previous');
+        }
+    });
+
+    // Ctrl+Shift+V - Play/Stop
+    globalShortcut.register('CommandOrControl+Shift+V', () => {
+        if (mainWindow && mainWindow.webContents) {
+            mainWindow.webContents.send('shortcut-toggle-play');
+            console.log('⏯️ Shortcut: Play/Stop');
+        }
+    });
+
+    // Ctrl+Shift+B - Next
+    globalShortcut.register('CommandOrControl+Shift+B', () => {
+        if (mainWindow && mainWindow.webContents) {
+            mainWindow.webContents.send('shortcut-next');
+            console.log('⏭️ Shortcut: Next');
+        }
+    });
+
+    console.log('✅ Đã đăng ký phím tắt: Ctrl+Shift+C/V/B');
+});
+
+// Hủy đăng ký phím tắt khi thoát
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll();
+});
 
 ipcMain.on('play-online', (event, notes, gameMode = 'sky') => {
     if (currentProcess) { currentProcess.kill(); currentProcess = null; }

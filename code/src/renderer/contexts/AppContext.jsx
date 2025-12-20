@@ -28,6 +28,11 @@ export const AppProvider = ({ children }) => {
   const progressInitialTimeRef = useRef(0);
   const [isMusicReady, setIsMusicReady] = useState(false);
 
+  // Refs cho shortcuts
+  const togglePlaybackRef = useRef(null);
+  const playNextRef = useRef(null);
+  const playPrevRef = useRef(null);
+
   useEffect(() => {
     if (window.api && window.api.onMusicReady) {
       window.api.onMusicReady(() => {
@@ -35,6 +40,30 @@ export const AppProvider = ({ children }) => {
         progressStartTimeRef.current = Date.now();
         setIsMusicReady(true);
       });
+    }
+
+    // Đăng ký keyboard shortcuts
+    if (window.api) {
+      if (window.api.onShortcutPrev) {
+        window.api.onShortcutPrev(() => {
+          console.log('⌨️ Shortcut: Previous');
+          playPrevRef.current?.(true);
+        });
+      }
+
+      if (window.api.onShortcutTogglePlay) {
+        window.api.onShortcutTogglePlay(() => {
+          console.log('⌨️ Shortcut: Toggle Play');
+          togglePlaybackRef.current?.();
+        });
+      }
+
+      if (window.api.onShortcutNext) {
+        window.api.onShortcutNext(() => {
+          console.log('⌨️ Shortcut: Next');
+          playNextRef.current?.(true);
+        });
+      }
     }
   }, []);
 
@@ -335,6 +364,9 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Gán vào ref để shortcuts có thể gọi
+  togglePlaybackRef.current = togglePlayback;
+
   // Hàm tua đến vị trí cụ thể
   const seekTo = (timeMs) => {
     setCurrentTime(timeMs);
@@ -406,6 +438,9 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Gán vào ref
+  playNextRef.current = playNext;
+
   // Chuyển bài trước
   const playPrev = async (autoPlay = false) => {
     if (!currentSong) return;
@@ -446,6 +481,9 @@ export const AppProvider = ({ children }) => {
       }, 500);
     }
   };
+
+  // Gán vào ref
+  playPrevRef.current = playPrev;
 
   // Xử lý khi bài hát kết thúc
   const handleSongEnd = async () => {

@@ -16,5 +16,9 @@ contextBridge.exposeInMainWorld('api', {
 
     deleteSongFile: (fileName) => ipcRenderer.invoke('delete-song-file', fileName),
 
-    onMusicReady: (callback) => ipcRenderer.on('music-ready', () => callback())
+    onMusicReady: (callback) => ipcRenderer.on('music-ready', () => callback()),
+
+    onShortcutPrev: (callback) => ipcRenderer.on('shortcut-prev', () => callback()),
+    onShortcutTogglePlay: (callback) => ipcRenderer.on('shortcut-toggle-play', () => callback()),
+    onShortcutNext: (callback) => ipcRenderer.on('shortcut-next', () => callback())
 });
