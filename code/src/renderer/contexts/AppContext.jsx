@@ -291,8 +291,9 @@ export const AppProvider = ({ children }) => {
           time: (note.time - currentTime) / playbackSpeed
         }));
 
+      const gameMode = localStorage.getItem('selectedGame') || 'sky';
       setTimeout(() => {
-        window.api.playOnline(notesToPlay);
+        window.api.playOnline(notesToPlay, gameMode);
       }, 50);
     }
   }, [playbackSpeed]); // Chỉ trigger khi thay đổi playbackSpeed
@@ -320,7 +321,9 @@ export const AppProvider = ({ children }) => {
             time: (note.time - currentTime) / playbackSpeed
           }));
 
-        window.api.playOnline(notesToPlay);
+        // Lấy game mode từ localStorage
+        const gameMode = localStorage.getItem('selectedGame') || 'sky';
+        window.api.playOnline(notesToPlay, gameMode);
         setStartTime(Date.now());
       }
     } else {
@@ -348,8 +351,9 @@ export const AppProvider = ({ children }) => {
           time: (note.time - timeMs) / playbackSpeed
         }));
 
+      const gameMode = localStorage.getItem('selectedGame') || 'sky';
       setTimeout(() => {
-        window.api.playOnline(notesToPlay);
+        window.api.playOnline(notesToPlay, gameMode);
       }, 100);
     }
   };
@@ -385,6 +389,7 @@ export const AppProvider = ({ children }) => {
 
     // Auto play nếu được yêu cầu
     if (autoPlay) {
+      const gameMode = localStorage.getItem('selectedGame') || 'sky';
       setTimeout(() => {
         setIsPlaying(true);
         setIsMusicReady(false);
@@ -395,7 +400,7 @@ export const AppProvider = ({ children }) => {
             ...note,
             time: note.time / playbackSpeed
           }));
-          window.api.playOnline(notesToPlay);
+          window.api.playOnline(notesToPlay, gameMode);
         }
       }, 500);
     }
@@ -425,6 +430,7 @@ export const AppProvider = ({ children }) => {
 
     // Auto play nếu được yêu cầu
     if (autoPlay) {
+      const gameMode = localStorage.getItem('selectedGame') || 'sky';
       setTimeout(() => {
         setIsPlaying(true);
         setIsMusicReady(false);
@@ -435,7 +441,7 @@ export const AppProvider = ({ children }) => {
             ...note,
             time: note.time / playbackSpeed
           }));
-          window.api.playOnline(notesToPlay);
+          window.api.playOnline(notesToPlay, gameMode);
         }
       }, 500);
     }
@@ -452,6 +458,7 @@ export const AppProvider = ({ children }) => {
         setCurrentTime(0);
         setIsMusicReady(false);
         progressInitialTimeRef.current = 0;
+        const gameMode = localStorage.getItem('selectedGame') || 'sky';
         setTimeout(() => {
           setIsPlaying(true);
           if (window.api && currentSong.songNotes) {
@@ -459,7 +466,7 @@ export const AppProvider = ({ children }) => {
               ...note,
               time: note.time / playbackSpeed
             }));
-            window.api.playOnline(notesToPlay);
+            window.api.playOnline(notesToPlay, gameMode);
           }
         }, 500);
         break;

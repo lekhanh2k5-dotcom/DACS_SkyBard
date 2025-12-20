@@ -6,10 +6,30 @@ const { spawn } = require('child_process');
 let mainWindow;
 let currentProcess = null;
 
-const scanCodeMap = {
+// Sky: Children of the Light mapping (1Key0-1Key14)
+const skyScanCodeMap = {
     "1Key0": "0x15", "1Key1": "0x16", "1Key2": "0x17", "1Key3": "0x18", "1Key4": "0x19",
     "1Key5": "0x23", "1Key6": "0x24", "1Key7": "0x25", "1Key8": "0x26", "1Key9": "0x27",
     "1Key10": "0x31", "1Key11": "0x32", "1Key12": "0x33", "1Key13": "0x34", "1Key14": "0x35"
+};
+
+// Genshin Impact mapping (1Key0-1Key14 → Z,X,C,V,B,N,M,A,S,D,F,G,H,J,Q)
+const genshinScanCodeMap = {
+    "1Key0": "0x2C",  // Z
+    "1Key1": "0x2D",  // X
+    "1Key2": "0x2E",  // C
+    "1Key3": "0x2F",  // V
+    "1Key4": "0x30",  // B
+    "1Key5": "0x31",  // N
+    "1Key6": "0x32",  // M
+    "1Key7": "0x1E",  // A
+    "1Key8": "0x1F",  // S
+    "1Key9": "0x20",  // D
+    "1Key10": "0x21", // F
+    "1Key11": "0x22", // G
+    "1Key12": "0x23", // H
+    "1Key13": "0x24", // J
+    "1Key14": "0x10"  // Q
 };
 
 function createWindow() {
@@ -34,10 +54,14 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
-ipcMain.on('play-online', (event, notes) => {
+ipcMain.on('play-online', (event, notes, gameMode = 'sky') => {
     if (currentProcess) { currentProcess.kill(); currentProcess = null; }
 
     if (!notes || !Array.isArray(notes)) return;
+
+    // Chọn scan code map theo game
+    const scanCodeMap = gameMode === 'genshin' ? genshinScanCodeMap : skyScanCodeMap;
+    console.log(`🎮 Chế độ: ${gameMode === 'genshin' ? 'Genshin Impact' : 'Sky: Children of the Light'}`);
 
     let psScript = `
 $code = @"

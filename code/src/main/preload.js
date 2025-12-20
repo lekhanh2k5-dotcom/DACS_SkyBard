@@ -2,7 +2,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-    playOnline: (notes) => ipcRenderer.send('play-online', notes),
+    playOnline: (notes, gameMode) => ipcRenderer.send('play-online', notes, gameMode),
 
     stopMusic: () => ipcRenderer.send('stop-music'),
 
