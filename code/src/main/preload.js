@@ -14,5 +14,7 @@ contextBridge.exposeInMainWorld('api', {
 
     fetchUrl: (url) => ipcRenderer.invoke('fetch-url', url),
 
+    deleteSongFile: (fileName) => ipcRenderer.invoke('delete-song-file', fileName),
+
     onMusicReady: (callback) => ipcRenderer.on('music-ready', () => callback())
 });

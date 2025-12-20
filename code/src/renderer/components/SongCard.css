@@ -72,3 +72,27 @@
     font-weight: 600;
     font-size: 13px;
 }
+
+.btn-delete-song {
+    padding: 6px 12px;
+    background: rgba(255, 68, 68, 0.1);
+    color: #ff4444;
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-delete-song:hover {
+    background: rgba(255, 68, 68, 0.2);
+    border-color: #ff4444;
+    transform: scale(1.05);
+}
+
+.btn-delete-song:active {
+    transform: scale(0.95);
+}

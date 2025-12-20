@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
 
@@ -8,26 +8,32 @@ export default function Library() {
     const [searchQuery, setSearchQuery] = useState('');
 
     // Hiển thị: local songs + imported songs + owned Firebase songs
-    const ownedSongs = Object.keys(songs)
-        .filter(key => {
-            const song = songs[key];
-            // Local/imported songs hoặc Firebase songs đã mua
-            return !song.isFromFirebase || song.isOwned;
-        })
-        .reduce((obj, key) => ({ ...obj, [key]: songs[key] }), {});
+    const ownedSongs = useMemo(() => {
+        return Object.keys(songs)
+            .filter(key => {
+                const song = songs[key];
+                // Local/imported songs hoặc Firebase songs đã mua
+                return !song.isFromFirebase || song.isOwned;
+            })
+            .reduce((obj, key) => ({ ...obj, [key]: songs[key] }), {});
+    }, [songs]);
 
-    const favoriteSongs = Object.keys(songs)
-        .filter(key => songs[key].isOwned && songs[key].isFavorite)
-        .reduce((obj, key) => ({ ...obj, [key]: songs[key] }), {});
+    const favoriteSongs = useMemo(() => {
+        return Object.keys(songs)
+            .filter(key => songs[key].isOwned && songs[key].isFavorite)
+            .reduce((obj, key) => ({ ...obj, [key]: songs[key] }), {});
+    }, [songs]);
 
     const baseSongs = activeLibraryTab === 'all' ? ownedSongs : favoriteSongs;
 
-    const displaySongs = Object.keys(baseSongs).filter(key => {
-        const song = baseSongs[key];
-        const query = searchQuery.toLowerCase();
-        return song.name.toLowerCase().includes(query) ||
-            (song.artist && song.artist.toLowerCase().includes(query));
-    }).reduce((obj, key) => ({ ...obj, [key]: baseSongs[key] }), {});
+    const displaySongs = useMemo(() => {
+        return Object.keys(baseSongs).filter(key => {
+            const song = baseSongs[key];
+            const query = searchQuery.toLowerCase();
+            return song.name.toLowerCase().includes(query) ||
+                (song.artist && song.artist.toLowerCase().includes(query));
+        }).reduce((obj, key) => ({ ...obj, [key]: baseSongs[key] }), {});
+    }, [baseSongs, searchQuery]);
 
     return (
         <div id="view-library" className="content-view active">

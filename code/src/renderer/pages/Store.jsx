@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useApp } from '../contexts/AppContext';
 import SongCard from '../components/SongCard';
 
@@ -7,15 +7,17 @@ export default function Store() {
     const [searchQuery, setSearchQuery] = useState('');
 
     // Chỉ hiển thị bài từ Firebase (cloud) - bao gồm cả đã và chưa sở hữu
-    const filteredSongs = Object.keys(songs).filter(key => {
-        const song = songs[key];
-        // Chỉ lấy bài từ Firebase
-        if (!song.isFromFirebase) return false;
+    const filteredSongs = useMemo(() => {
+        return Object.keys(songs).filter(key => {
+            const song = songs[key];
+            // Chỉ lấy bài từ Firebase
+            if (!song.isFromFirebase) return false;
 
-        const query = searchQuery.toLowerCase();
-        return song.name.toLowerCase().includes(query) ||
-            (song.artist && song.artist.toLowerCase().includes(query));
-    });
+            const query = searchQuery.toLowerCase();
+            return song.name.toLowerCase().includes(query) ||
+                (song.artist && song.artist.toLowerCase().includes(query));
+        });
+    }, [songs, searchQuery]);
 
     return (
         <div id="view-store" className="content-view active">

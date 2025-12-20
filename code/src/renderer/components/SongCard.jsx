@@ -2,7 +2,7 @@ import { useApp } from '../contexts/AppContext';
 import './SongCard.css';
 
 export default function SongCard({ song, songKey, onPlay }) {
-    const { buySong } = useApp();
+    const { buySong, deleteSong } = useApp();
 
     const handleClick = () => {
         if (song.isOwned) {
@@ -13,6 +13,11 @@ export default function SongCard({ song, songKey, onPlay }) {
         } else {
             buySong(songKey, song.price);
         }
+    };
+
+    const handleDelete = (e) => {
+        e.stopPropagation(); // Ngăn trigger handleClick
+        deleteSong(songKey);
     };
 
     return (
@@ -28,10 +33,23 @@ export default function SongCard({ song, songKey, onPlay }) {
             </div>
 
             <div className="card-action">
-                {song.isOwned ? (
-                    <span className="card-owned">✅ Đã sở hữu</span>
+                {song.isFromFirebase ? (
+                    // Bài từ Firebase: hiện owned hoặc giá
+                    song.isOwned ? (
+                        <span className="card-owned">✅ Đã sở hữu</span>
+                    ) : (
+                        <span className="card-price">💰 {song.price} xu</span>
+                    )
                 ) : (
-                    <span className="card-price">💰 {song.price} xu</span>
+                    // Bài local/imported: hiện nút xóa
+                    <button
+                        className="btn-delete-song"
+                        onClick={handleDelete}
+                        title="Xóa bài hát"
+                    >
+                        <span>🗑️</span>
+                        <span>Xóa</span>
+                    </button>
                 )}
             </div>
         </div>

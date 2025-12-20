@@ -545,6 +545,57 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Xóa bài hát (chỉ local/imported songs)
+  const deleteSong = async (songKey) => {
+    const song = songs[songKey];
+
+    if (!song) return;
+
+    // Không cho xóa bài từ Firebase
+    if (song.isFromFirebase) {
+      alert('Không thể xóa bài hát trên đám mây!');
+      return;
+    }
+
+    // Xác nhận xóa
+    if (!confirm(`Bạn có chắc muốn xóa bài "${song.name}"?`)) {
+      return;
+    }
+
+    // Nếu đang phát bài này thì dừng
+    if (currentSong && (currentSong.key === songKey || currentSong === song)) {
+      setIsPlaying(false);
+      setCurrentSong(null);
+      setCurrentTime(0);
+      if (window.api) {
+        window.api.stopMusic();
+      }
+    }
+
+    // Xóa file nếu có fileName (imported/local file)
+    if (song.fileName && window.api && window.api.deleteSongFile) {
+      try {
+        const result = await window.api.deleteSongFile(song.fileName);
+        if (result.error) {
+          console.error('Lỗi khi xóa file:', result.error);
+        } else {
+          console.log(`✅ Đã xóa file: ${song.fileName}`);
+        }
+      } catch (error) {
+        console.error('Lỗi khi xóa file:', error);
+      }
+    }
+
+    // Xóa khỏi danh sách state
+    setSongs(prev => {
+      const updated = { ...prev };
+      delete updated[songKey];
+      return updated;
+    });
+
+    console.log(`Đã xóa bài: ${song.name}`);
+  };
+
   const value = {
     songs,
     loading,         // Thêm loading state
@@ -568,6 +619,7 @@ export const AppProvider = ({ children }) => {
     buySong,
     toggleFavorite,
     importSongFile,  // Hàm import file nhạc
+    deleteSong,      // Hàm xóa bài hát
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

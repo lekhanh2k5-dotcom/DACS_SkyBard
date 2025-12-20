@@ -315,3 +315,25 @@ ipcMain.handle('fetch-url', async (event, url) => {
         return { error: err.message };
     }
 });
+
+// Handler để xóa file nhạc
+ipcMain.handle('delete-song-file', async (event, fileName) => {
+    try {
+        // Xóa từ các nguồn có thể
+        const userDataPath = app.getPath('userData');
+        const songsDir = path.join(userDataPath, 'songs');
+        const filePath = path.join(songsDir, fileName);
+
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+            console.log(`Đã xóa file: ${fileName}`);
+            return { success: true };
+        } else {
+            console.warn(`File không tồn tại: ${fileName}`);
+            return { success: true }; // Vẫn trả success vì mục tiêu là file không còn
+        }
+    } catch (err) {
+        console.error('Error deleting file:', err);
+        return { error: err.message };
+    }
+});
