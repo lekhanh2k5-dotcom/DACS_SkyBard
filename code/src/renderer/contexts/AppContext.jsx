@@ -154,23 +154,54 @@ export const AppProvider = ({ children }) => {
     try {
       let fullSongData;
 
-      // Kiểm tra xem bài hát có được load từ file không
+      // 1. Bài từ local file hoặc imported
       if (songMetadata.isFromFile && songMetadata.fileName) {
-        // Nếu bài hát đã được load từ file, sử dụng data có sẵn
         fullSongData = {
           ...songMetadata,
           key: songKey
         };
         console.log(`Chọn bài từ file: ${songMetadata.fileName}`);
-      } else if (songMetadata.songNotes && songMetadata.songNotes.length > 0) {
-        // Nếu bài hát có sẵn songNotes (từ mockSongs)
+      }
+      // 2. Bài có sẵn songNotes (mockSongs hoặc local)
+      else if (songMetadata.songNotes && songMetadata.songNotes.length > 0) {
         fullSongData = {
           ...songMetadata,
           key: songKey
         };
         console.log(`Chọn bài từ mockSongs: ${songMetadata.name}`);
-      } else {
-        // Trường hợp khác: thử đọc file theo tên bài hát
+      }
+      // 3. Bài từ Firebase - chỉ load nếu đã sở hữu
+      else if (songMetadata.isFromFirebase) {
+        if (!songMetadata.isOwned) {
+          alert('Vui lòng mua bài hát này trước khi phát!');
+          return;
+        }
+
+        // Load songNotes từ Firebase Storage
+        console.log(`🔐 Bài đã mua - đang load nội dung từ Firebase: ${songMetadata.name}`);
+
+        if (songMetadata.txtFilePath) {
+          try {
+            const { getSongTxtContent } = await import('../../services/firebaseService');
+            const content = await getSongTxtContent(songMetadata.txtFilePath);
+            fullSongData = {
+              ...songMetadata,
+              ...content,
+              key: songKey
+            };
+            console.log(`✅ Đã load songNotes cho: ${songMetadata.name}`);
+          } catch (error) {
+            console.error(`❌ Lỗi khi load songNotes:`, error);
+            alert('Không thể tải nội dung bài hát!');
+            return;
+          }
+        } else {
+          alert('Bài hát này chưa có file nhạc!');
+          return;
+        }
+      }
+      // 4. Fallback: thử đọc file theo tên
+      else {
         const fileName = `${songMetadata.name}.txt`;
         console.log(`Đang tải file: ${fileName}...`);
 
@@ -178,7 +209,6 @@ export const AppProvider = ({ children }) => {
 
         if (fileData && !fileData.error) {
           const songContent = Array.isArray(fileData) ? fileData[0] : fileData;
-
           fullSongData = {
             ...songMetadata,
             ...songContent,

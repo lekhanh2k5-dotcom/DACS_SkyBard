@@ -6,8 +6,12 @@ export default function Store() {
     const { songs, selectSong } = useApp();
     const [searchQuery, setSearchQuery] = useState('');
 
+    // Chỉ hiển thị bài từ Firebase (cloud) - bao gồm cả đã và chưa sở hữu
     const filteredSongs = Object.keys(songs).filter(key => {
         const song = songs[key];
+        // Chỉ lấy bài từ Firebase
+        if (!song.isFromFirebase) return false;
+
         const query = searchQuery.toLowerCase();
         return song.name.toLowerCase().includes(query) ||
             (song.artist && song.artist.toLowerCase().includes(query));

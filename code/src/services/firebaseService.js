@@ -23,48 +23,15 @@ export const fetchSongsFromFirebase = async () => {
             const songsData = snapshot.val();
             console.log('📦 Raw data from Firebase:', songsData);
 
-            // Convert object to array
+            // Convert object to array - CHỈ LẤY METADATA, KHÔNG LOAD SONG NOTES
             const songsArray = Object.keys(songsData).map(key => ({
                 id: key,
-                ...songsData[key]
+                ...songsData[key],
+                songNotes: [] // Không load songNotes ban đầu
             }));
 
-            console.log(`📋 Converted to array: ${songsArray.length} songs`);
-
-            // Load nội dung từ txtFileUrl hoặc txtFilePath
-            const songsWithContent = await Promise.all(
-                songsArray.map(async (song) => {
-                    // Nếu có txtFileUrl (Google Drive link)
-                    if (song.txtFileUrl) {
-                        try {
-                            console.log(`🔗 Loading from Drive: ${song.name}`);
-                            const response = await fetch(song.txtFileUrl);
-                            const text = await response.text();
-                            const songData = JSON.parse(text);
-                            const content = Array.isArray(songData) ? songData[0] : songData;
-                            return { ...song, ...content };
-                        } catch (error) {
-                            console.warn(`⚠️ Lỗi load từ Drive: ${song.name}`, error.message);
-                            return { ...song, songNotes: [] };
-                        }
-                    }
-
-                    // Nếu có txtFilePath (Firebase Storage)
-                    if (song.txtFilePath) {
-                        try {
-                            const content = await getSongTxtContent(song.txtFilePath);
-                            return { ...song, ...content };
-                        } catch (error) {
-                            console.warn(`⚠️ Không tìm thấy file: ${song.txtFilePath}`);
-                            return { ...song, songNotes: [] };
-                        }
-                    }
-
-                    return song;
-                })
-            );
-
-            return songsWithContent;
+            console.log(`📋 Loaded metadata for ${songsArray.length} songs (no songNotes yet)`);
+            return songsArray;
         } else {
             console.log('Không có dữ liệu bài hát trên Firebase');
             return [];
@@ -89,26 +56,11 @@ export const listenToSongs = (callback) => {
             const songsData = snapshot.val();
             const songsArray = Object.keys(songsData).map(key => ({
                 id: key,
-                ...songsData[key]
+                ...songsData[key],
+                songNotes: [] // Không load songNotes trong realtime listener
             }));
 
-            // Load nội dung file .txt từ Storage
-            const songsWithContent = await Promise.all(
-                songsArray.map(async (song) => {
-                    if (song.txtFilePath) {
-                        try {
-                            const content = await getSongTxtContent(song.txtFilePath);
-                            return { ...song, ...content };
-                        } catch (error) {
-                            console.warn(`⚠️ Không tìm thấy file: ${song.txtFilePath}`);
-                            return { ...song, songNotes: [] };
-                        }
-                    }
-                    return song;
-                })
-            );
-
-            callback(songsWithContent);
+            callback(songsArray);
         } else {
             callback([]);
         }

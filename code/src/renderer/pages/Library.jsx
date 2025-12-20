@@ -7,8 +7,13 @@ export default function Library() {
     const { songs, activeLibraryTab, setActiveLibraryTab, selectSong, importSongFile } = useApp();
     const [searchQuery, setSearchQuery] = useState('');
 
+    // Hiển thị: local songs + imported songs + owned Firebase songs
     const ownedSongs = Object.keys(songs)
-        .filter(key => songs[key].isOwned)
+        .filter(key => {
+            const song = songs[key];
+            // Local/imported songs hoặc Firebase songs đã mua
+            return !song.isFromFirebase || song.isOwned;
+        })
         .reduce((obj, key) => ({ ...obj, [key]: songs[key] }), {});
 
     const favoriteSongs = Object.keys(songs)
