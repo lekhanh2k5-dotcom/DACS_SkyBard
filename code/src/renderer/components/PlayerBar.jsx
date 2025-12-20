@@ -13,6 +13,8 @@ export default function PlayerBar() {
         setPlaybackSpeed,
         togglePlayback,
         seekTo,
+        playNext,
+        playPrev,
         importSongFile
     } = useApp();
 
@@ -107,7 +109,7 @@ export default function PlayerBar() {
                         </svg>
                     </button>
 
-                    <button className="btn-control" title="Bài trước">
+                    <button className="btn-control" title="Bài trước" onClick={() => playPrev(true)}>
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M3 2h2v12H3V2zm3 6l8-6v12l-8-6z" />
                         </svg>
@@ -123,7 +125,7 @@ export default function PlayerBar() {
                         </svg>
                     </button>
 
-                    <button className="btn-control" title="Bài tiếp">
+                    <button className="btn-control" title="Bài tiếp" onClick={() => playNext(true)}>
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M11 2h2v12h-2V2zM2 2l8 6-8 6V2z" />
                         </svg>

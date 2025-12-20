@@ -264,6 +264,8 @@ export const AppProvider = ({ children }) => {
           if (window.api) {
             window.api.stopMusic();
           }
+          // Xử lý chế độ phát khi hết bài
+          handleSongEnd();
         } else {
           setCurrentTime(newTime);
         }
@@ -349,6 +351,125 @@ export const AppProvider = ({ children }) => {
       setTimeout(() => {
         window.api.playOnline(notesToPlay);
       }, 100);
+    }
+  };
+
+  // Lấy danh sách bài hát có thể phát (owned songs)
+  const getPlayableSongs = () => {
+    return Object.keys(songs).filter(key => {
+      const song = songs[key];
+      return !song.isFromFirebase || song.isOwned;
+    });
+  };
+
+  // Chuyển bài tiếp theo
+  const playNext = async (autoPlay = false) => {
+    if (!currentSong) return;
+
+    const playableSongs = getPlayableSongs();
+    if (playableSongs.length === 0) return;
+
+    const currentIndex = playableSongs.findIndex(key => songs[key] === currentSong || key === currentSong.key);
+
+    let nextIndex;
+    if (playbackMode === 'shuffle') {
+      // Random song
+      nextIndex = Math.floor(Math.random() * playableSongs.length);
+    } else {
+      // Next in sequence
+      nextIndex = (currentIndex + 1) % playableSongs.length;
+    }
+
+    const nextSongKey = playableSongs[nextIndex];
+    await selectSong(nextSongKey);
+
+    // Auto play nếu được yêu cầu
+    if (autoPlay) {
+      setTimeout(() => {
+        setIsPlaying(true);
+        setIsMusicReady(false);
+        progressInitialTimeRef.current = 0;
+
+        if (window.api && songs[nextSongKey].songNotes) {
+          const notesToPlay = songs[nextSongKey].songNotes.map(note => ({
+            ...note,
+            time: note.time / playbackSpeed
+          }));
+          window.api.playOnline(notesToPlay);
+        }
+      }, 500);
+    }
+  };
+
+  // Chuyển bài trước
+  const playPrev = async (autoPlay = false) => {
+    if (!currentSong) return;
+
+    const playableSongs = getPlayableSongs();
+    if (playableSongs.length === 0) return;
+
+    const currentIndex = playableSongs.findIndex(key => songs[key] === currentSong || key === currentSong.key);
+
+    let prevIndex;
+    if (playbackMode === 'shuffle') {
+      // Random song
+      prevIndex = Math.floor(Math.random() * playableSongs.length);
+    } else {
+      // Previous in sequence
+      prevIndex = currentIndex - 1;
+      if (prevIndex < 0) prevIndex = playableSongs.length - 1;
+    }
+
+    const prevSongKey = playableSongs[prevIndex];
+    await selectSong(prevSongKey);
+
+    // Auto play nếu được yêu cầu
+    if (autoPlay) {
+      setTimeout(() => {
+        setIsPlaying(true);
+        setIsMusicReady(false);
+        progressInitialTimeRef.current = 0;
+
+        if (window.api && songs[prevSongKey].songNotes) {
+          const notesToPlay = songs[prevSongKey].songNotes.map(note => ({
+            ...note,
+            time: note.time / playbackSpeed
+          }));
+          window.api.playOnline(notesToPlay);
+        }
+      }, 500);
+    }
+  };
+
+  // Xử lý khi bài hát kết thúc
+  const handleSongEnd = async () => {
+    switch (playbackMode) {
+      case 'once':
+        // Dừng hẳn
+        break;
+      case 'repeat-one':
+        // Phát lại bài hiện tại
+        setCurrentTime(0);
+        setIsMusicReady(false);
+        progressInitialTimeRef.current = 0;
+        setTimeout(() => {
+          setIsPlaying(true);
+          if (window.api && currentSong.songNotes) {
+            const notesToPlay = currentSong.songNotes.map(note => ({
+              ...note,
+              time: note.time / playbackSpeed
+            }));
+            window.api.playOnline(notesToPlay);
+          }
+        }, 500);
+        break;
+      case 'sequence':
+      case 'shuffle':
+        // Phát bài tiếp theo với auto-play
+        await playNext(true);
+        break;
+      default:
+        break;
     }
   };
 
@@ -442,6 +563,8 @@ export const AppProvider = ({ children }) => {
     selectSong,      // Hàm chọn bài (không phát)
     togglePlayback,  // Hàm phát/dừng
     seekTo,          // Hàm tua
+    playNext,        // Hàm phát bài tiếp theo
+    playPrev,        // Hàm phát bài trước
     buySong,
     toggleFavorite,
     importSongFile,  // Hàm import file nhạc
