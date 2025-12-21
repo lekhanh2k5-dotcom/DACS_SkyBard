@@ -30,11 +30,17 @@ if (isFirebaseConfigValid) {
         storage = getStorage(app);
         auth = getAuth(app);
         console.log('✅ Firebase initialized successfully');
+        console.log('📊 Config:', {
+            projectId: firebaseConfig.projectId,
+            authDomain: firebaseConfig.authDomain
+        });
     } catch (error) {
         console.error('❌ Firebase initialization failed:', error);
+        console.error('⚠️ Please check your Firebase config in .env file');
     }
 } else {
     console.warn('⚠️ Firebase config not found - app will use local data only');
+    console.warn('📝 Please create .env file with Firebase credentials');
 }
 
 export { database, storage, auth };
