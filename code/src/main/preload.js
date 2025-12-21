@@ -20,5 +20,10 @@ contextBridge.exposeInMainWorld('api', {
 
     onShortcutPrev: (callback) => ipcRenderer.on('shortcut-prev', () => callback()),
     onShortcutTogglePlay: (callback) => ipcRenderer.on('shortcut-toggle-play', () => callback()),
-    onShortcutNext: (callback) => ipcRenderer.on('shortcut-next', () => callback())
+    onShortcutNext: (callback) => ipcRenderer.on('shortcut-next', () => callback()),
+
+    // Auth window functions
+    openLoginWindow: () => ipcRenderer.send('open-login-window'),
+    closeLoginWindow: () => ipcRenderer.send('close-login-window'),
+    onLoginWindowClosed: (callback) => ipcRenderer.on('login-window-closed', () => callback())
 });

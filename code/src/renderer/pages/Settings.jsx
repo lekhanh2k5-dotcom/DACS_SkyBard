@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import LoginModal from '../components/LoginModal';
 
 export default function Settings() {
     const [selectedGame, setSelectedGame] = useState('sky');
-    const [showLoginModal, setShowLoginModal] = useState(false);
     const { user, logout } = useAuth();
 
     // Load game selection từ localStorage
@@ -234,7 +232,13 @@ export default function Settings() {
                                 Đăng nhập để mua bài hát và đồng bộ dữ liệu
                             </p>
                             <button
-                                onClick={() => setShowLoginModal(true)}
+                                onClick={() => {
+                                    if (window.api && window.api.openLoginWindow) {
+                                        window.api.openLoginWindow();
+                                    } else {
+                                        alert('Tính năng đăng nhập chưa khả dụng trong môi trường này');
+                                    }
+                                }}
                                 style={{
                                     padding: '14px 32px',
                                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -269,9 +273,9 @@ export default function Settings() {
                     </p>
                 </div>
             </div>
-
-            {/* Login Modal */}
-            <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+        </div>
+    );
+}
 ```
         </div>
     );

@@ -4,6 +4,7 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 
 let mainWindow;
+let loginWindow = null;
 let currentProcess = null;
 
 // Sky: Children of the Light mapping (1Key0-1Key14)
@@ -50,6 +51,50 @@ function createWindow() {
     }
 
     console.log('Loading from:', path.join(__dirname, '../dist/index.html'));
+}
+
+// Tạo cửa sổ đăng nhập
+function createLoginWindow() {
+    // Nếu đã có cửa sổ login đang mở, focus vào nó
+    if (loginWindow) {
+        loginWindow.focus();
+        return;
+    }
+
+    loginWindow = new BrowserWindow({
+        width: 500,
+        height: 650,
+        resizable: false,
+        parent: mainWindow, // Set main window làm parent
+        modal: true, // Modal window - block main window
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js')
+        },
+        autoHideMenuBar: true,
+        title: 'Đăng nhập - SkyBard'
+    });
+
+    // Load trang login
+    if (process.env.VITE_DEV_SERVER_URL) {
+        loginWindow.loadURL(`${process.env.VITE_DEV_SERVER_URL}#/login`);
+    } else {
+        loginWindow.loadFile(path.join(__dirname, '../dist/index.html'), {
+            hash: 'login'
+        });
+    }
+
+    // Khi đóng cửa sổ login
+    loginWindow.on('closed', () => {
+        loginWindow = null;
+        // Thông báo cho main window rằng login window đã đóng
+        if (mainWindow && mainWindow.webContents) {
+            mainWindow.webContents.send('login-window-closed');
+        }
+    });
+
+    console.log('🔐 Opened login window');
 }
 
 app.whenReady().then(() => {
@@ -153,6 +198,18 @@ ipcMain.on('stop-music', () => {
     if (currentProcess) {
         currentProcess.kill();
         currentProcess = null;
+    }
+});
+
+// Mở cửa sổ đăng nhập
+ipcMain.on('open-login-window', () => {
+    createLoginWindow();
+});
+
+// Đóng cửa sổ đăng nhập (gọi từ login window sau khi đăng nhập thành công)
+ipcMain.on('close-login-window', () => {
+    if (loginWindow) {
+        loginWindow.close();
     }
 });
 

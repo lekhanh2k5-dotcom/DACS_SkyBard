@@ -5,10 +5,32 @@ import PlayerBar from './components/PlayerBar';
 import Store from './pages/Store';
 import Library from './pages/Library';
 import Settings from './pages/Settings';
+import LoginWindow from './pages/LoginWindow';
+import { useEffect, useState } from 'react';
 
 function AppContent() {
     const { activeTab, loading: appLoading } = useApp();
     const { loading: authLoading } = useAuth();
+    const [isLoginWindow, setIsLoginWindow] = useState(false);
+
+    // Kiểm tra xem có phải là login window không (dựa vào hash)
+    useEffect(() => {
+        const checkHash = () => {
+            if (window.location.hash === '#/login' || window.location.hash === '#login') {
+                setIsLoginWindow(true);
+            }
+        };
+        
+        checkHash();
+        window.addEventListener('hashchange', checkHash);
+        
+        return () => window.removeEventListener('hashchange', checkHash);
+    }, []);
+
+    // Nếu là login window, hiển thị LoginWindow component
+    if (isLoginWindow) {
+        return <LoginWindow />;
+    }
 
     // Hiển thị loading khi đang khởi tạo app
     if (authLoading || appLoading) {
