@@ -137,8 +137,7 @@ export default function LoginWindow() {
                         )}
                     </div>
 
-                    <but    setDisplayName(''); // Clear display name khi chuyển mode
-                        ton
+                    <button
                         type="submit"
                         className="btn-auth"
                         disabled={loading}
