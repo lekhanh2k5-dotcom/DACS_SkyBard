@@ -1,52 +1,863 @@
 {
     "songs": {
         "song1": {
-            "name": "Chờ anh về",
             "author": "Bray",
-            "composer": "KChip",
-            "price": 10000,
-            "isOwned": false,
-            "isFavorite": false,
             "bpm": 1161,
-            "txtFilePath": "songs/txt/Chờ anh về.txt",
-            "coverImage": null,
-            "isFromFirebase": true
+            "composer": "KChip",
+            "isFavorite": false,
+            "isFromFirebase": true,
+            "isOwned": false,
+            "name": "song test 1",
+            "price": 10000,
+            "txtFilePath": "songs/txt/Chờ anh về.txt"
         },
         "song2": {
-            "name": "Hazy moon",
             "author": "Unknown",
+            "bpm": 120,
             "composer": "Unknown",
-            "price": 0,
+            "isFavorite": false,
+            "isFromFirebase": true,
             "isOwned": true,
-            "isFavorite": false,
-            "bpm": 120,
-            "txtFilePath": "songs/txt/Hazy moon.txt",
-            "coverImage": null,
-            "isFromFirebase": true
-        },
-        "song3": {
-            "name": "Zoo",
-            "author": "Unknown",
-            "composer": "Unknown",
-            "price": 5000,
-            "isOwned": false,
-            "isFavorite": false,
-            "bpm": 120,
-            "txtFilePath": "songs/txt/Zoo.txt",
-            "coverImage": null,
-            "isFromFirebase": true
+            "name": "How to make milions before grandma dies (update)",
+            "price": 0,
+            "txtFilePath": "songs/txt/How to make milions before grandma dies (update).txt"
         },
         "song4": {
-            "name": "All is Found(Frozen 2)",
-            "author": "Disney",
-            "composer": "Unknown",
-            "price": 15000,
-            "isOwned": false,
-            "isFavorite": false,
+            "author": "EXSH",
             "bpm": 120,
-            "txtFilePath": "songs/txt/All is Found(Frozen 2).txt",
-            "coverImage": null,
-            "isFromFirebase": true
+            "composer": "KChip",
+            "isFavorite": false,
+            "isFromFirebase": true,
+            "isOwned": false,
+            "name": "Cứ Đổ Tại Cơn Mưa",
+            "price": 99999999,
+            "txtFilePath": "songs/txt/Cứ Đổ Tại Cơn Mưa.txt"
+        },
+        "song_vn_001": {
+            "name": "Ầu ơ ví dầu",
+            "author": "Hương Lan",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Ầu ơ ví dầu.txt",
+            "region": "vietnam"
+        },
+        "song_vn_002": {
+            "name": "Bình yên",
+            "author": "Vũ.",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Bình yên.txt",
+            "region": "vietnam"
+        },
+        "song_vn_003": {
+            "name": "Bo xì bo",
+            "author": "Hoàng Thùy Linh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Bo xì bo.txt",
+            "region": "vietnam"
+        },
+        "song_vn_004": {
+            "name": "Cảm giác lúc ấy sẽ ra sao",
+            "author": "Lou Hoàng",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Cảm giác lúc ấy sẽ ra sao.txt",
+            "region": "vietnam"
+        },
+        "song_vn_005": {
+            "name": "Cảm Ơn Và Xin Lỗi",
+            "author": "Chillies",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Cảm Ơn Và Xin Lỗi.txt",
+            "region": "vietnam"
+        },
+        "song_vn_006": {
+            "name": "Có một chuyện tình",
+            "author": "Phan Mạnh Quỳnh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Có một chuyện tình.txt",
+            "region": "vietnam"
+        },
+        "song_vn_007": {
+            "name": "Còn gì đẹp hơn",
+            "author": "Thắng (Ngọt)",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Còn gì đẹp hơn.txt",
+            "region": "vietnam"
+        },
+        "song_vn_008": {
+            "name": "Chạnh lòng thương cô 4",
+            "author": "Sansan",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Chạnh lòng thương cô 4.txt",
+            "region": "vietnam"
+        },
+        "song_vn_009": {
+            "name": "Dậy mà đi",
+            "author": "Nguyễn Xuân Tân",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Dậy mà đi.txt",
+            "region": "vietnam"
+        },
+        "song_vn_010": {
+            "name": "Dù cho tận thế (vẫn yêu em)",
+            "author": "Erik",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Dù cho tận thế (vẫn yêu em).txt",
+            "region": "vietnam"
+        },
+        "song_vn_011": {
+            "name": "Đẩy xe bò",
+            "author": "Phương Mỹ Chi",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Đẩy xe bò .txt",
+            "region": "vietnam"
+        },
+        "song_vn_012": {
+            "name": "Em đồng ý (I do)",
+            "author": "Đức Phúc x 911",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Em đồng ý (I do).txt",
+            "region": "vietnam"
+        },
+        "song_vn_013": {
+            "name": "Em xinh",
+            "author": "MONO",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Em xinh.txt",
+            "region": "vietnam"
+        },
+        "song_vn_014": {
+            "name": "Gọi tên một nỗi buồn (Dk)",
+            "author": "Đan Trường",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Gọi tên một nỗi buồn (Dk).txt",
+            "region": "vietnam"
+        },
+        "song_vn_015": {
+            "name": "Gió",
+            "author": "Jank",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Gió.txt",
+            "region": "vietnam"
+        },
+        "song_vn_016": {
+            "name": "Hào khí Việt Nam",
+            "author": "Holy Thắng",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Hào khí Việt Nam.txt",
+            "region": "vietnam"
+        },
+        "song_vn_017": {
+            "name": "Hẹn ước từ hư vô",
+            "author": "Mỹ Tâm",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Hẹn ước từ hư vô.txt",
+            "region": "vietnam"
+        },
+        "song_vn_018": {
+            "name": "Hoa mặt trời(PMQ)",
+            "author": "Phan Mạnh Quỳnh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Hoa mặt trời(PMQ).txt",
+            "region": "vietnam"
+        },
+        "song_vn_019": {
+            "name": "Kỵ sĩ và ánh sao",
+            "author": "DTAP & Haley",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Kỵ sĩ và ánh sao.txt",
+            "region": "vietnam"
+        },
+        "song_vn_020": {
+            "name": "Kho Báu",
+            "author": "Rhymastic",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Kho Báu.txt",
+            "region": "vietnam"
+        },
+        "song_vn_021": {
+            "name": "Lá cờ",
+            "author": "Tạ Quang Thắng",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Lá cờ.txt",
+            "region": "vietnam"
+        },
+        "song_vn_022": {
+            "name": "Lắm Lúc",
+            "author": "Tiên Tiên",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Lắm Lúc.txt",
+            "region": "vietnam"
+        },
+        "song_vn_023": {
+            "name": "Lặng yên( Lặng yên dưới vực sâu OST )",
+            "author": "Bùi Anh Tuấn",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Lặng yên( Lặng yên dưới vực sâu OST ).txt",
+            "region": "vietnam"
+        },
+        "song_vn_024": {
+            "name": "Lớn rồi còn khóc nhè(Easy)",
+            "author": "Trúc Nhân",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Lớn rồi còn khóc nhè(Easy).txt",
+            "region": "vietnam"
+        },
+        "song_vn_025": {
+            "name": "Lớn rồi còn khóc nhè",
+            "author": "Trúc Nhân",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Lớn rồi còn khóc nhè.txt",
+            "region": "vietnam"
+        },
+        "song_vn_026": {
+            "name": "MADE IN VIETNAM",
+            "author": "Microwave",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/MADE IN VIETNAM.txt",
+            "region": "vietnam"
+        },
+        "song_vn_027": {
+            "name": "Mai mình xa",
+            "author": "Thịnh Suy",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Mai mình xa.txt",
+            "region": "vietnam"
+        },
+        "song_vn_028": {
+            "name": "Máu đỏ da vàng",
+            "author": "Erik",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Máu đỏ da vàng.txt",
+            "region": "vietnam"
+        },
+        "song_vn_029": {
+            "name": "Một vòng Việt Nam",
+            "author": "Tùng Dương",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Một vòng Việt Nam.txt",
+            "region": "vietnam"
+        },
+        "song_vn_030": {
+            "name": "Nấu ăn cho em",
+            "author": "Đen Vâu",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Nấu ăn cho em.txt",
+            "region": "vietnam"
+        },
+        "song_vn_031": {
+            "name": "Nếu một mai tôi bay lên trời",
+            "author": "Trúc Nhân",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Nếu một mai tôi bay lên trời.txt",
+            "region": "vietnam"
+        },
+        "song_vn_032": {
+            "name": "Nếu những tiếc nuối(đk)",
+            "author": "Blow",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Nếu những tiếc nuối(đk).txt",
+            "region": "vietnam"
+        },
+        "song_vn_033": {
+            "name": "Nỗi Đau Giữa Hoà Bình",
+            "author": "Nguyễn Văn Chung",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Nỗi Đau Giữa Hoà Bình.txt",
+            "region": "vietnam"
+        },
+        "song_vn_034": {
+            "name": "Ngàn năm ánh sáng (Full)",
+            "author": "Đặng Vĩnh Thịnh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Ngàn năm ánh sáng (Full).txt",
+            "region": "vietnam"
+        },
+        "song_vn_035": {
+            "name": "Ngày ấy (Yesterday)",
+            "author": "Vũ Cát Tường",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Ngày ấy (Yesterday).txt",
+            "region": "vietnam"
+        },
+        "song_vn_036": {
+            "name": "Ngày mùa đông",
+            "author": "Trung Quân Idol",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Ngày mùa đông.txt",
+            "region": "vietnam"
+        },
+        "song_vn_037": {
+            "name": "Ngồi hát đỡ buồn",
+            "author": "Trúc Nhân",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Ngồi hát đỡ buồn.txt",
+            "region": "vietnam"
+        },
+        "song_vn_038": {
+            "name": "Người đầu tiên",
+            "author": "Juky San",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Người đầu tiên.txt",
+            "region": "vietnam"
+        },
+        "song_vn_039": {
+            "name": "Người như anh xứng đáng cô đơn",
+            "author": "Team Anh Trai Say Hi",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Người như anh xứng đáng cô đơn.txt",
+            "region": "vietnam"
+        },
+        "song_vn_040": {
+            "name": "Người rất tốt, không gặp sẽ tốt hơn",
+            "author": "Hiền Hồ",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Người rất tốt, không gặp sẽ tốt hơn.txt",
+            "region": "vietnam"
+        },
+        "song_vn_041": {
+            "name": "Nhắm mắt thấy mùa hè(2024)",
+            "author": "Nguyên Hà",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Nhắm mắt thấy mùa hè(2024).txt",
+            "region": "vietnam"
+        },
+        "song_vn_042": {
+            "name": "Phép màu (Update)",
+            "author": "B-Ray",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Phép màu (Update).txt",
+            "region": "vietnam"
+        },
+        "song_vn_043": {
+            "name": "Phép màu",
+            "author": "B-Ray",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Phép màu.txt",
+            "region": "vietnam"
+        },
+        "song_vn_044": {
+            "name": "Quá khứ còn lại gì",
+            "author": "Rocker Nguyễn",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Quá khứ còn lại gì.txt",
+            "region": "vietnam"
+        },
+        "song_vn_045": {
+            "name": "Quốc ca",
+            "author": "Văn Cao",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Quốc ca.txt",
+            "region": "vietnam"
+        },
+        "song_vn_046": {
+            "name": "Sau lời từ khước (1)",
+            "author": "Phan Mạnh Quỳnh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Sau lời từ khước (1).txt",
+            "region": "vietnam"
+        },
+        "song_vn_047": {
+            "name": "Sẽ hứa đi cùng nhau(Đi để trở về 3)",
+            "author": "Soobin Hoàng Sơn",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Sẽ hứa đi cùng nhau(Đi để trở về 3).txt",
+            "region": "vietnam"
+        },
+        "song_vn_048": {
+            "name": "Tấm lòng son",
+            "author": "H-Kray",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Tấm lòng son.txt",
+            "region": "vietnam"
+        },
+        "song_vn_049": {
+            "name": "Tâm sự cùng người lạ(1)",
+            "author": "Tiên Cookie",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Tâm sự cùng người lạ(1).txt",
+            "region": "vietnam"
+        },
+        "song_vn_050": {
+            "name": "Tâm sự cùng người lạ",
+            "author": "Tiên Cookie",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Tâm sự cùng người lạ.txt",
+            "region": "vietnam"
+        },
+        "song_vn_051": {
+            "name": "Tội cho em",
+            "author": "Hana Cẩm Tiên",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Tội cho em.txt",
+            "region": "vietnam"
+        },
+        "song_vn_052": {
+            "name": "Tự sự",
+            "author": "Orange",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Tự sự.txt",
+            "region": "vietnam"
+        },
+        "song_vn_053": {
+            "name": "Thằng cuội (TTHVTCX)",
+            "author": "Phan Mạnh Quỳnh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Thằng cuội (TTHVTCX).txt",
+            "region": "vietnam"
+        },
+        "song_vn_054": {
+            "name": "Thằng Điên",
+            "author": "JustaTee x Phương Ly",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Thằng Điên.txt",
+            "region": "vietnam"
+        },
+        "song_vn_055": {
+            "name": "The Mermaid Song(2)",
+            "author": "Unknown",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/The Mermaid Song(2).txt",
+            "region": "vietnam"
+        },
+        "song_vn_056": {
+            "name": "Trước khi em tồn tại",
+            "author": "Thắng (Ngọt)",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Trước khi em tồn tại.txt",
+            "region": "vietnam"
+        },
+        "song_vn_057": {
+            "name": "Vạn vật như muốn ta bên nhau(1)",
+            "author": "RIO",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Vạn vật như muốn ta bên nhau(1).txt",
+            "region": "vietnam"
+        },
+        "song_vn_058": {
+            "name": "Vạn vật như muốn ta bên nhau",
+            "author": "RIO",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Vạn vật như muốn ta bên nhau.txt",
+            "region": "vietnam"
+        },
+        "song_vn_059": {
+            "name": "Vết mưa(1)",
+            "author": "Vũ Cát Tường",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Vết mưa(1).txt",
+            "region": "vietnam"
+        },
+        "song_vn_060": {
+            "name": "Vết mưa",
+            "author": "Vũ Cát Tường",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Vết mưa.txt",
+            "region": "vietnam"
+        },
+        "song_vn_061": {
+            "name": "Yên bình có quá đắt không",
+            "author": "Khiêm",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Yên bình có quá đắt không.txt",
+            "region": "vietnam"
+        },
+        "song_vn_062": {
+            "name": "Zoo",
+            "author": "Unknown",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Zoo.txt",
+            "region": "vietnam"
+        },
+        "song_vn_063": {
+            "name": "Bầu trời mới",
+            "author": "Da LAB",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Bầu trời mới.txt",
+            "region": "vietnam"
+        },
+        "song_vn_064": {
+            "name": "Đi giữa trời rực rỡ",
+            "author": "Ngô Lan Hương",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Đi giữa trời rực rỡ.txt",
+            "region": "vietnam"
+        },
+        "song_vn_065": {
+            "name": "Giữ anh cho ngày hôm qua",
+            "author": "Hoàng Dũng",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Giữ anh cho ngày hôm qua.txt",
+            "region": "vietnam"
+        },
+        "song_vn_066": {
+            "name": "Hẹn lần sau",
+            "author": "Dick x PC x Tofu",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Hẹn lần sau.txt",
+            "region": "vietnam"
+        },
+        "song_vn_067": {
+            "name": "Hẹn một mai (OST 4N2C1TY)",
+            "author": "Bùi Anh Tuấn",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Hẹn một mai (OST 4N2C1TY).txt",
+            "region": "vietnam"
+        },
+        "song_vn_068": {
+            "name": "id 072019 _ 3107 ft 267",
+            "author": "W/n",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/id 072019 _ 3107 ft 267.txt",
+            "region": "vietnam"
+        },
+        "song_vn_069": {
+            "name": "Mơ",
+            "author": "Vũ Cát Tường",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Mơ.txt",
+            "region": "vietnam"
+        },
+        "song_vn_070": {
+            "name": "Ném Câu Yêu Vào Không Trung",
+            "author": "Hoàng Dũng",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Ném Câu Yêu Vào Không Trung.txt",
+            "region": "vietnam"
+        },
+        "song_vn_071": {
+            "name": "Nếu những tiếc nuối",
+            "author": "Blow",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Nếu những tiếc nuối.txt",
+            "region": "vietnam"
+        },
+        "song_vn_072": {
+            "name": "NHÀ TÔI CÓ TREO MỘT LÁ CỜ",
+            "author": "DTAP",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/NHÀ TÔI CÓ TREO MỘT LÁ CỜ.txt",
+            "region": "vietnam"
+        },
+        "song_vn_073": {
+            "name": "Những lời hứa bỏ quên",
+            "author": "Vũ.",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Những lời hứa bỏ quên.txt",
+            "region": "vietnam"
+        },
+        "song_vn_074": {
+            "name": "Sau lời từ khước",
+            "author": "Phan Mạnh Quỳnh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Sau lời từ khước .txt",
+            "region": "vietnam"
+        },
+        "song_vn_075": {
+            "name": "Từ đó (Mắt Biếc OST)",
+            "author": "Phan Mạnh Quỳnh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Từ đó (Mắt Biếc OST).txt",
+            "region": "vietnam"
+        },
+        "song_vn_076": {
+            "name": "Tự Nguyện",
+            "author": "Trương Quốc Khánh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Tự Nguyện.txt",
+            "region": "vietnam"
+        },
+        "song_vn_077": {
+            "name": "Từng là",
+            "author": "Vũ Cát Tường",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Từng là.txt",
+            "region": "vietnam"
+        },
+        "song_vn_078": {
+            "name": "Thịnh vượng Việt Nam sáng ngời",
+            "author": "Bùi Trường Linh",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Thịnh vượng Việt Nam sáng ngời.txt",
+            "region": "vietnam"
+        },
+        "song_vn_079": {
+            "name": "4 mùa thương em",
+            "author": "Lập Nguyên",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/4 mùa thương em.txt",
+            "region": "vietnam"
+        },
+        "song_vn_080": {
+            "name": "5 Ngón Bàn Tay",
+            "author": "Nguyễn Quốc Hùng",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/5 Ngón Bàn Tay.txt",
+            "region": "vietnam"
+        },
+        "song_vn_081": {
+            "name": "Anh nhớ ra",
+            "author": "Vũ.",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Anh nhớ ra.txt",
+            "region": "vietnam"
+        },
+        "song_jp_001": {
+            "name": "Attack on Titan - Wedding version",
+            "author": "Linked Horizon",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Attack on Titan - Wedding version.txt",
+            "region": "japanese"
+        },
+        "song_jp_002": {
+            "name": "Dream Lantern (Your Name OST)",
+            "author": "RADWIMPS",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Dream Lantern (Your Name OST).txt",
+            "region": "japanese"
+        },
+        "song_jp_003": {
+            "name": "Hashira, Entrance to Infinity Castle",
+            "author": "Go Shiina",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Hashira, Entrance to Infinity Castle.txt",
+            "region": "japanese",
+            "bpm": 140
+        },
+        "song_jp_004": {
+            "name": "Lit (A Slient Voice OST)",
+            "author": "Kensuke Ushio",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Lit (A Slient Voice OST).txt",
+            "region": "japanese"
+        },
+        "song_jp_005": {
+            "name": "Peko_s Promise (Doraemon movie 34)",
+            "author": "Doraemon Movie 34",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Peko_s Promise (Doraemon movie 34).txt",
+            "region": "japanese",
+            "bpm": 110
+        },
+        "song_jp_006": {
+            "name": "Post-Script",
+            "author": "Yorushika",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Post-Script.txt",
+            "region": "japanese"
+        },
+        "song_jp_007": {
+            "name": "Post-Script_",
+            "author": "Yorushika",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Post-Script_.txt",
+            "region": "japanese"
+        },
+        "song_jp_008": {
+            "name": "Shinzou wo Sasageyo!",
+            "author": "Linked Horizon",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Shinzou wo Sasageyo!.txt",
+            "region": "japanese",
+            "bpm": 150
+        },
+        "song_jp_009": {
+            "name": "Sketch - スケッチ (Doraemon movie 44)",
+            "author": "Doraemon Movie 44",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Sketch - スケッチ (Doraemon movie 44).txt",
+            "region": "japanese",
+            "bpm": 100
+        },
+        "song_jp_010": {
+            "name": "Soushi Souai (Conan movie 27)",
+            "author": "aiko",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Soushi Souai (Conan movie 27).txt",
+            "region": "japanese"
+        },
+        "song_jp_011": {
+            "name": "The 6th Summer",
+            "author": "PLAVE",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/The 6th Summer.txt",
+            "region": "japanese"
+        },
+        "song_jp_012": {
+            "name": "「日々の影」Shadow of Our Days",
+            "author": "Unknown",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/「日々の影」Shadow of Our Days.txt",
+            "region": "japanese",
+            "bpm": 110
+        },
+        "song_kr_001": {
+            "name": "폰서트(Phonecert)",
+            "author": "10cm",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/폰서트(Phonecert).txt",
+            "region": "korean"
+        },
+        "song_cn_001": {
+            "name": "你看,天黑了(Nhìn kìa, trời tối rồi)",
+            "author": "Unknown",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/你看,天黑了(Nhìn kìa, trời tối rồi).txt",
+            "region": "chinese",
+            "bpm": 100
+        },
+        "song_cn_002": {
+            "name": "Tháp rơi tự do - 跳楼机",
+            "author": "LBI Lợi Bỉ",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Tháp rơi tự do - 跳楼机.txt",
+            "region": "chinese",
+            "bpm": 130
+        },
+        "song_wd_001": {
+            "name": "Blue",
+            "author": "Yung Kai",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Blue.txt",
+            "region": "world"
+        },
+        "song_wd_002": {
+            "name": "How to make milions before grandma dies",
+            "author": "Billkin",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/How to make milions before grandma dies.txt.txt",
+            "region": "world",
+            "bpm": 110
+        },
+        "song_wd_003": {
+            "name": "Making my way",
+            "author": "Sơn Tùng M-TP",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Making my way .txt",
+            "region": "world",
+            "bpm": 130
+        },
+        "song_wd_004": {
+            "name": "The Mermaid Song",
+            "author": "Unknown",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/The Mermaid Song.txt",
+            "region": "world",
+            "bpm": 100
+        },
+        "song_wd_005": {
+            "name": "Round and round",
+            "author": "Heize",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/Round and round .txt",
+            "region": "world"
+        },
+        "song_wd_006": {
+            "name": "A morning of the Slag Ravine",
+            "author": "Joe Hisaishi",
+            "composer": "KChip",
+            "price": 30000,
+            "txtFilePath": "songs/txt/A morning of the Slag Ravine.txt",
+            "region": "world"
         }
     }
 }

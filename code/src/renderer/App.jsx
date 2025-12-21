@@ -20,10 +20,10 @@ function AppContent() {
                 setIsLoginWindow(true);
             }
         };
-        
+
         checkHash();
         window.addEventListener('hashchange', checkHash);
-        
+
         return () => window.removeEventListener('hashchange', checkHash);
     }, []);
 

@@ -33,7 +33,7 @@ export default function Login() {
             }
         } catch (err) {
             console.error('Auth error:', err);
-            
+
             // Xử lý lỗi Firebase
             if (err.code === 'auth/user-not-found') {
                 setError('Email không tồn tại');

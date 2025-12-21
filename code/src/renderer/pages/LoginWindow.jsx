@@ -51,7 +51,7 @@ export default function LoginWindow() {
             }
         } catch (err) {
             console.error('Auth error:', err);
-            
+
             // Xử lý lỗi Firebase
             if (err.code === 'auth/configuration-not-found') {
                 setError('⚠️ Firebase Authentication chưa được cấu hình. Vui lòng kiểm tra Firebase Console và bật Authentication.');

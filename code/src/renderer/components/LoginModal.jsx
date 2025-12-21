@@ -37,7 +37,7 @@ export default function LoginModal({ isOpen, onClose }) {
             }
         } catch (err) {
             console.error('Auth error:', err);
-            
+
             // Xử lý lỗi Firebase
             if (err.code === 'auth/user-not-found') {
                 setError('Email không tồn tại');
@@ -66,7 +66,7 @@ export default function LoginModal({ isOpen, onClose }) {
         <div className="login-modal-overlay" onClick={handleOverlayClick}>
             <div className="login-modal-box">
                 <button className="modal-close-btn" onClick={onClose}>×</button>
-                
+
                 <div className="modal-header">
                     <h2>🎵 SkyBard</h2>
                     <p className="modal-subtitle">

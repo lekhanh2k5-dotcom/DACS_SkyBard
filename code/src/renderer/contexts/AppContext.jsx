@@ -194,7 +194,7 @@ export const AppProvider = ({ children }) => {
         if (key.startsWith('firebase_')) {
           const songId = key.replace('firebase_', '');
           const isOwned = userProfile.ownedSongs[songId] === true;
-          
+
           if (updated[key].isOwned !== isOwned) {
             updated[key] = { ...updated[key], isOwned };
             hasChanges = true;
@@ -577,9 +577,9 @@ export const AppProvider = ({ children }) => {
       // Gọi Firebase purchaseSong
       const { purchaseSong } = await import('../../services/firebaseService');
       const songId = songKey.replace('firebase_', ''); // Remove prefix
-      
+
       const result = await purchaseSong(user.uid, songId, price);
-      
+
       if (result.success) {
         // Cập nhật state local
         setSongs(prev => ({

@@ -11,7 +11,7 @@ export default function Store() {
         const song = songs[key];
         // Chỉ lấy bài từ Firebase
         if (!song.isFromFirebase) return false;
-        
+
         // Ẩn bài đã mua
         if (song.isOwned) return false;
 

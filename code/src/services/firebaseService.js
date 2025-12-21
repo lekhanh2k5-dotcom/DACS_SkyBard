@@ -204,7 +204,7 @@ export const createUserProfile = async (userId, email, displayName = null) => {
 
     try {
         const userRef = ref(database, `users/${userId}`);
-        
+
         const userProfile = {
             email: email,
             displayName: displayName || email.split('@')[0], // Dùng phần trước @ làm tên
@@ -217,7 +217,7 @@ export const createUserProfile = async (userId, email, displayName = null) => {
 
         await set(userRef, userProfile);
         console.log(`✅ Created user profile for ${email} with 1000 coins`);
-        
+
         return userProfile;
     } catch (error) {
         console.error('❌ Error creating user profile:', error);
@@ -263,7 +263,7 @@ export const updateUserCoins = async (userId, amount) => {
     try {
         const userCoinsRef = ref(database, `users/${userId}/coins`);
         const snapshot = await get(userCoinsRef);
-        
+
         const currentCoins = snapshot.exists() ? snapshot.val() : 0;
         const newCoins = currentCoins + amount;
 
@@ -273,7 +273,7 @@ export const updateUserCoins = async (userId, amount) => {
 
         await set(userCoinsRef, newCoins);
         console.log(`💰 Updated coins for user ${userId}: ${currentCoins} → ${newCoins}`);
-        
+
         return newCoins;
     } catch (error) {
         console.error('❌ Error updating user coins:', error);
@@ -314,7 +314,7 @@ export const setFavoriteSong = async (userId, songId, isFavorite) => {
 
     try {
         const favoriteSongRef = ref(database, `users/${userId}/favoriteSongs/${songId}`);
-        
+
         if (isFavorite) {
             await set(favoriteSongRef, true);
             console.log(`❤️ Added song ${songId} to favorites`);

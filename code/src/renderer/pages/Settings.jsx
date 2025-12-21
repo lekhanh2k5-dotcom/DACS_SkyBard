@@ -153,7 +153,7 @@ export default function Settings() {
                 {/* User Profile Section */}
                 <div className="setting-group" style={{ marginTop: '30px' }}>
                     <h3>👤 Tài khoản người dùng</h3>
-                    
+
                     {user ? (
                         // Đã đăng nhập
                         <div style={{
@@ -189,7 +189,7 @@ export default function Settings() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <button
                                 onClick={async () => {
                                     if (confirm('Bạn có chắc muốn đăng xuất?')) {
