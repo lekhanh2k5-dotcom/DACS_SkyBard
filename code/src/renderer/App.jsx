@@ -5,13 +5,12 @@ import PlayerBar from './components/PlayerBar';
 import Store from './pages/Store';
 import Library from './pages/Library';
 import Settings from './pages/Settings';
-import Login from './pages/Login';
 
 function AppContent() {
     const { activeTab, loading: appLoading } = useApp();
-    const { user, loading: authLoading } = useAuth();
+    const { loading: authLoading } = useAuth();
 
-    // Hiển thị loading khi đang kiểm tra auth
+    // Hiển thị loading khi đang khởi tạo app
     if (authLoading || appLoading) {
         return (
             <div style={{
@@ -30,12 +29,7 @@ function AppContent() {
         );
     }
 
-    // Nếu chưa đăng nhập → hiển thị Login
-    if (!user) {
-        return <Login />;
-    }
-
-    // Đã đăng nhập → hiển thị app chính
+    // Luôn hiển thị app chính (không cần đăng nhập)
     return (
         <>
             <div className="app-container">

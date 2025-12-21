@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import LoginModal from '../components/LoginModal';
 
 export default function Settings() {
     const [selectedGame, setSelectedGame] = useState('sky');
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const { user, logout } = useAuth();
 
     // Load game selection từ localStorage
     useEffect(() => {
@@ -148,10 +152,113 @@ export default function Settings() {
                     </div>
                 </div>
 
-                <div className="setting-group">
-                    <h3>👤 Tài khoản</h3>
-                    <button className="btn-setting">Đăng nhập</button>
-                    <button className="btn-setting">Đăng ký</button>
+                {/* User Profile Section */}
+                <div className="setting-group" style={{ marginTop: '30px' }}>
+                    <h3>👤 Tài khoản người dùng</h3>
+                    
+                    {user ? (
+                        // Đã đăng nhập
+                        <div style={{
+                            padding: '20px',
+                            background: 'var(--card-bg)',
+                            borderRadius: '12px',
+                            border: '2px solid var(--border)'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
+                                <div style={{
+                                    width: '50px',
+                                    height: '50px',
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '24px'
+                                }}>
+                                    👤
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '4px' }}>
+                                        {user.email}
+                                    </div>
+                                    <div style={{ fontSize: '14px', color: 'var(--text-sub)' }}>
+                                        💰 <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
+                                            Đang tải xu...
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button
+                                onClick={async () => {
+                                    if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                                        await logout();
+                                        console.log('✅ Đã đăng xuất');
+                                    }
+                                }}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    background: '#f44336',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#d32f2f';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#f44336';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                🚪 Đăng xuất
+                            </button>
+                        </div>
+                    ) : (
+                        // Chưa đăng nhập
+                        <div style={{
+                            padding: '30px',
+                            background: 'var(--card-bg)',
+                            borderRadius: '12px',
+                            border: '2px dashed var(--border)',
+                            textAlign: 'center'
+                        }}>
+                            <div style={{ fontSize: '48px', marginBottom: '15px' }}>🔒</div>
+                            <p style={{ color: 'var(--text-sub)', marginBottom: '20px' }}>
+                                Bạn chưa đăng nhập<br />
+                                Đăng nhập để mua bài hát và đồng bộ dữ liệu
+                            </p>
+                            <button
+                                onClick={() => setShowLoginModal(true)}
+                                style={{
+                                    padding: '14px 32px',
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    fontSize: '16px',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                }}
+                            >
+                                🔐 Đăng nhập / Đăng ký
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="setting-group">
@@ -162,6 +269,10 @@ export default function Settings() {
                     </p>
                 </div>
             </div>
+
+            {/* Login Modal */}
+            <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+```
         </div>
     );
 }
