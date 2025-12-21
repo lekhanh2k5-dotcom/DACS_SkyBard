@@ -6,7 +6,7 @@ import {
     signOut,
     onAuthStateChanged
 } from 'firebase/auth';
-import { createUserProfile } from '../../services/firebaseService';
+import { createUserProfile, getUserProfile } from '../../services/firebaseService';
 
 const AuthContext = createContext();
 
@@ -20,6 +20,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [userProfile, setUserProfile] = useState(null); // Thêm userProfile state
     const [loading, setLoading] = useState(true);
 
     // Lắng nghe thay đổi auth state
@@ -30,9 +31,33 @@ export const AuthProvider = ({ children }) => {
             return;
         }
 
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             console.log('🔐 Auth state changed:', user ? user.email : 'Not logged in');
             setUser(user);
+            
+            // Load user profile từ Firebase nếu đã đăng nhập
+            if (user) {
+                try {
+                    const profile = await getUserProfile(user.uid);
+                    if (profile) {
+                        setUserProfile(profile);
+                        console.log('👤 User profile loaded:', {
+                            email: profile.email,
+                            coins: profile.coins
+                        });
+                    } else {
+                        // Nếu chưa có profile, tạo mới (trường hợp đăng nhập lần đầu)
+                        console.log('⚠️ Profile not found, creating...');
+                        const newProfile = await createUserProfile(user.uid, user.email);
+                        setUserProfile(newProfile);
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading user profile:', error);
+                }
+            } else {
+                setUserProfile(null);
+            }
+            
             setLoading(false);
         });
 
@@ -54,11 +79,11 @@ export const AuthProvider = ({ children }) => {
         
         // Tạo user profile trong Realtime Database (tặng 1000 xu)
         try {
-            await createUserProfile(userCredential.user.uid, email);
+            const newProfile = await createUserProfile(userCredential.user.uid, email);
+            setUserProfile(newProfile); // Set profile ngay sau khi đăng ký
             console.log('✅ User registered with 1000 coins:', userCredential.user.email);
         } catch (error) {
             console.error('⚠️ Failed to create user profile:', error);
-            // Vẫn cho phép đăng ký, sẽ tạo profile sau
         }
         
         return userCredential;
@@ -67,15 +92,31 @@ export const AuthProvider = ({ children }) => {
     // Đăng xuất
     const logout = async () => {
         if (!auth) throw new Error('Firebase Auth not initialized');
+        setUserProfile(null); // Clear profile khi logout
         return signOut(auth);
+    };
+
+    // Hàm refresh user profile (dùng sau khi mua bài, thay đổi xu)
+    const refreshUserProfile = async () => {
+        if (!user) return;
+        
+        try {
+            const profile = await getUserProfile(user.uid);
+            setUserProfile(profile);
+            console.log('🔄 User profile refreshed');
+        } catch (error) {
+            console.error('❌ Error refreshing profile:', error);
+        }
     };
 
     const value = {
         user,
+        userProfile, // Export userProfile
         loading,
         login,
         register,
-        logout
+        logout,
+        refreshUserProfile // Export refresh function
     };
 
     return (

@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function Settings() {
     const [selectedGame, setSelectedGame] = useState('sky');
-    const { user, logout } = useAuth();
+    const { user, userProfile, logout } = useAuth();
 
     // Load game selection từ localStorage
     useEffect(() => {
@@ -180,8 +180,8 @@ export default function Settings() {
                                         {user.email}
                                     </div>
                                     <div style={{ fontSize: '14px', color: 'var(--text-sub)' }}>
-                                        💰 <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
-                                            Đang tải xu...
+                                        💰 <span style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '16px' }}>
+                                            {userProfile ? `${userProfile.coins} xu` : 'Đang tải...'}
                                         </span>
                                     </div>
                                 </div>
