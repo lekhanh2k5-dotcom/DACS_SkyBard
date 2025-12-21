@@ -1,8 +1,10 @@
 import { useApp } from '../contexts/AppContext';
+import { useAuth } from '../contexts/AuthContext';
 import './Sidebar.css';
 
 export default function Sidebar() {
     const { activeTab, setActiveTab } = useApp();
+    const { user, userProfile } = useAuth();
 
     const navItems = [
         { id: 'store', label: '🏪 Cửa hàng', icon: '🏪' },
@@ -31,10 +33,19 @@ export default function Sidebar() {
             </ul>
 
             <div className="user-profile">
-                <div className="user-avatar">👤</div>
+                <div className="user-avatar">
+                    {user ? '👤' : '🔒'}
+                </div>
                 <div className="user-info">
-                    <div className="user-name">Guest User</div>
-                    <div className="user-balance">💰 1,000 xu</div>
+                    <div className="user-name">
+                        {user
+                            ? (userProfile?.displayName || user.email.split('@')[0])
+                            : 'Chưa đăng nhập'
+                        }
+                    </div>
+                    <div className="user-balance">
+                        💰 {userProfile ? `${userProfile.coins.toLocaleString()} xu` : '-- xu'}
+                    </div>
                 </div>
             </div>
         </aside>

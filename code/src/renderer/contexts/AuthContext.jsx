@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../../config/firebase';
+import { auth, database } from '../../config/firebase';
 import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
     onAuthStateChanged
 } from 'firebase/auth';
+import { ref, onValue, off } from 'firebase/database';
 import { createUserProfile, getUserProfile } from '../../services/firebaseService';
 
 const AuthContext = createContext();
@@ -34,7 +35,7 @@ export const AuthProvider = ({ children }) => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             console.log('🔐 Auth state changed:', user ? user.email : 'Not logged in');
             setUser(user);
-            
+
             // Load user profile từ Firebase nếu đã đăng nhập
             if (user) {
                 try {
@@ -57,12 +58,40 @@ export const AuthProvider = ({ children }) => {
             } else {
                 setUserProfile(null);
             }
-            
+
             setLoading(false);
         });
 
         return unsubscribe;
     }, []);
+
+    // Real-time listener cho user profile - tự động cập nhật khi có thay đổi trên Firebase
+    useEffect(() => {
+        if (!user || !database) return;
+
+        const userRef = ref(database, `users/${user.uid}`);
+
+        // Lắng nghe thay đổi real-time
+        const unsubscribe = onValue(userRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                setUserProfile(data);
+                console.log('🔄 User profile updated in real-time:', {
+                    email: data.email,
+                    coins: data.coins,
+                    displayName: data.displayName
+                });
+            }
+        }, (error) => {
+            console.error('❌ Error listening to profile changes:', error);
+        });
+
+        // Cleanup listener khi user logout hoặc component unmount
+        return () => {
+            off(userRef);
+            console.log('🔇 Real-time listener removed');
+        };
+    }, [user]);
 
     // Đăng nhập
     const login = async (email, password) => {
@@ -73,10 +102,10 @@ export const AuthProvider = ({ children }) => {
     // Đăng ký
     const register = async (email, password, displayName = null) => {
         if (!auth) throw new Error('Firebase Auth not initialized');
-        
+
         // Tạo user trong Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        
+
         // Tạo user profile trong Realtime Database (tặng 1000 xu)
         try {
             const newProfile = await createUserProfile(userCredential.user.uid, email, displayName);
@@ -85,7 +114,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('⚠️ Failed to create user profile:', error);
         }
-        
+
         return userCredential;
     };
 
@@ -99,7 +128,7 @@ export const AuthProvider = ({ children }) => {
     // Hàm refresh user profile (dùng sau khi mua bài, thay đổi xu)
     const refreshUserProfile = async () => {
         if (!user) return;
-        
+
         try {
             const profile = await getUserProfile(user.uid);
             setUserProfile(profile);
