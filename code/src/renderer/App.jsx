@@ -1,4 +1,5 @@
 import { AppProvider, useApp } from './contexts/AppContext';
+import { AuthProvider } from './contexts/AuthContext';
 import Sidebar from './components/Sidebar';
 import PlayerBar from './components/PlayerBar';
 import Store from './pages/Store';
@@ -43,8 +44,10 @@ export default function App() {
     console.log('🎨 App component rendering...');
 
     return (
-        <AppProvider>
-            <AppContent />
-        </AppProvider>
+        <AuthProvider>
+            <AppProvider>
+                <AppContent />
+            </AppProvider>
+        </AuthProvider>
     );
 }
