@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -19,6 +20,7 @@ const isFirebaseConfigValid = firebaseConfig.apiKey && firebaseConfig.projectId;
 let app = null;
 let database = null;
 let storage = null;
+let auth = null;
 
 if (isFirebaseConfigValid) {
     try {
@@ -26,6 +28,7 @@ if (isFirebaseConfigValid) {
         app = initializeApp(firebaseConfig);
         database = getDatabase(app);
         storage = getStorage(app);
+        auth = getAuth(app);
         console.log('✅ Firebase initialized successfully');
     } catch (error) {
         console.error('❌ Firebase initialization failed:', error);
@@ -34,5 +37,5 @@ if (isFirebaseConfigValid) {
     console.warn('⚠️ Firebase config not found - app will use local data only');
 }
 
-export { database, storage };
+export { database, storage, auth };
 export default app;
