@@ -6,6 +6,7 @@ import {
     signOut,
     onAuthStateChanged
 } from 'firebase/auth';
+import { createUserProfile } from '../../services/firebaseService';
 
 const AuthContext = createContext();
 
@@ -51,8 +52,14 @@ export const AuthProvider = ({ children }) => {
         // Tạo user trong Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
-        // Sẽ tạo user profile trong Database ở commit sau
-        console.log('✅ User registered:', userCredential.user.email);
+        // Tạo user profile trong Realtime Database (tặng 1000 xu)
+        try {
+            await createUserProfile(userCredential.user.uid, email);
+            console.log('✅ User registered with 1000 coins:', userCredential.user.email);
+        } catch (error) {
+            console.error('⚠️ Failed to create user profile:', error);
+            // Vẫn cho phép đăng ký, sẽ tạo profile sau
+        }
         
         return userCredential;
     };

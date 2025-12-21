@@ -185,3 +185,190 @@ export const uploadSongToFirebase = async (songData, txtContent) => {
         throw error;
     }
 };
+
+
+// ============================================
+// USER MANAGEMENT FUNCTIONS
+// ============================================
+
+/**
+ * Tạo user profile mới khi đăng ký
+ * @param {string} userId - Firebase Auth UID
+ * @param {string} email - Email của user
+ * @param {string} displayName - Tên hiển thị (optional)
+ */
+export const createUserProfile = async (userId, email, displayName = null) => {
+    if (!database) {
+        throw new Error('Firebase database not initialized');
+    }
+
+    try {
+        const userRef = ref(database, `users/${userId}`);
+        
+        const userProfile = {
+            email: email,
+            displayName: displayName || email.split('@')[0], // Dùng phần trước @ làm tên
+            coins: 1000, // Tặng 1000 xu khi đăng ký
+            createdAt: Date.now(),
+            ownedSongs: {}, // Object chứa {songId: true}
+            favoriteSongs: {}, // Object chứa {songId: true}
+            uploadedSongs: {} // Bài hát upload local (không lên Firebase)
+        };
+
+        await set(userRef, userProfile);
+        console.log(`✅ Created user profile for ${email} with 1000 coins`);
+        
+        return userProfile;
+    } catch (error) {
+        console.error('❌ Error creating user profile:', error);
+        throw error;
+    }
+};
+
+/**
+ * Lấy thông tin user profile
+ * @param {string} userId - Firebase Auth UID
+ */
+export const getUserProfile = async (userId) => {
+    if (!database) {
+        throw new Error('Firebase database not initialized');
+    }
+
+    try {
+        const userRef = ref(database, `users/${userId}`);
+        const snapshot = await get(userRef);
+
+        if (snapshot.exists()) {
+            return snapshot.val();
+        } else {
+            console.warn(`⚠️ User profile not found for ${userId}`);
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ Error getting user profile:', error);
+        throw error;
+    }
+};
+
+/**
+ * Cập nhật coins của user
+ * @param {string} userId - Firebase Auth UID
+ * @param {number} amount - Số xu cần cộng/trừ (có thể âm)
+ */
+export const updateUserCoins = async (userId, amount) => {
+    if (!database) {
+        throw new Error('Firebase database not initialized');
+    }
+
+    try {
+        const userCoinsRef = ref(database, `users/${userId}/coins`);
+        const snapshot = await get(userCoinsRef);
+        
+        const currentCoins = snapshot.exists() ? snapshot.val() : 0;
+        const newCoins = currentCoins + amount;
+
+        if (newCoins < 0) {
+            throw new Error('Không đủ xu');
+        }
+
+        await set(userCoinsRef, newCoins);
+        console.log(`💰 Updated coins for user ${userId}: ${currentCoins} → ${newCoins}`);
+        
+        return newCoins;
+    } catch (error) {
+        console.error('❌ Error updating user coins:', error);
+        throw error;
+    }
+};
+
+/**
+ * Thêm bài hát vào danh sách đã mua của user
+ * @param {string} userId - Firebase Auth UID
+ * @param {string} songId - ID của bài hát
+ */
+export const addOwnedSong = async (userId, songId) => {
+    if (!database) {
+        throw new Error('Firebase database not initialized');
+    }
+
+    try {
+        const ownedSongRef = ref(database, `users/${userId}/ownedSongs/${songId}`);
+        await set(ownedSongRef, true);
+        console.log(`✅ Added song ${songId} to user ${userId} owned list`);
+    } catch (error) {
+        console.error('❌ Error adding owned song:', error);
+        throw error;
+    }
+};
+
+/**
+ * Toggle favorite song
+ * @param {string} userId - Firebase Auth UID
+ * @param {string} songId - ID của bài hát
+ * @param {boolean} isFavorite - true/false
+ */
+export const setFavoriteSong = async (userId, songId, isFavorite) => {
+    if (!database) {
+        throw new Error('Firebase database not initialized');
+    }
+
+    try {
+        const favoriteSongRef = ref(database, `users/${userId}/favoriteSongs/${songId}`);
+        
+        if (isFavorite) {
+            await set(favoriteSongRef, true);
+            console.log(`❤️ Added song ${songId} to favorites`);
+        } else {
+            await set(favoriteSongRef, null); // Xóa khỏi favorites
+            console.log(`💔 Removed song ${songId} from favorites`);
+        }
+    } catch (error) {
+        console.error('❌ Error setting favorite song:', error);
+        throw error;
+    }
+};
+
+/**
+ * Mua bài hát (trừ xu + thêm vào ownedSongs)
+ * @param {string} userId - Firebase Auth UID
+ * @param {string} songId - ID của bài hát
+ * @param {number} price - Giá bài hát
+ */
+export const purchaseSong = async (userId, songId, price) => {
+    if (!database) {
+        throw new Error('Firebase database not initialized');
+    }
+
+    try {
+        // 1. Kiểm tra số xu hiện tại
+        const userCoinsRef = ref(database, `users/${userId}/coins`);
+        const snapshot = await get(userCoinsRef);
+        const currentCoins = snapshot.exists() ? snapshot.val() : 0;
+
+        if (currentCoins < price) {
+            throw new Error(`Không đủ xu! Bạn có ${currentCoins} xu, cần ${price} xu`);
+        }
+
+        // 2. Trừ xu
+        await updateUserCoins(userId, -price);
+
+        // 3. Thêm vào ownedSongs
+        await addOwnedSong(userId, songId);
+
+        // 4. Log transaction (optional)
+        const transactionRef = ref(database, `transactions/${userId}/${Date.now()}`);
+        await set(transactionRef, {
+            songId: songId,
+            amount: -price,
+            type: 'purchase',
+            timestamp: Date.now()
+        });
+
+        console.log(`✅ Purchase successful: ${songId} for ${price} coins`);
+        return { success: true, newCoins: currentCoins - price };
+    } catch (error) {
+        console.error('❌ Purchase failed:', error);
+        throw error;
+    }
+};
+
