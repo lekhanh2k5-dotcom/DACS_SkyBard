@@ -85,6 +85,11 @@ export default function LoginWindow() {
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     {error && (
+                        <div className="auth-error">
+                            ⚠️ {error}
+                        </div>
+                    )}
+
                     {showRegister && (
                         <div className="form-group">
                             <label htmlFor="displayName">Tên tài khoản</label>
@@ -111,12 +116,7 @@ export default function LoginWindow() {
                             placeholder="your@email.com"
                             required
                             disabled={loading}
-                            autoFocus={!showRegister}ail}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="your@email.com"
-                            required
-                            disabled={loading}
-                            autoFocus
+                            autoFocus={!showRegister}
                         />
                     </div>
 
