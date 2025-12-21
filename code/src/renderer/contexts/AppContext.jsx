@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { mockSongs } from '../data/songs';
 import { fetchSongsFromFirebase, listenToSongs } from '../../services/firebaseService';
+import { useAuth } from './AuthContext';
 
 const AppContext = createContext();
 
@@ -13,6 +14,7 @@ export const useApp = () => {
 };
 
 export const AppProvider = ({ children }) => {
+  const { user, userProfile, refreshUserProfile } = useAuth(); // Lấy auth context
   const [songs, setSongs] = useState({});
   const [loading, setLoading] = useState(true);
   const [currentSong, setCurrentSong] = useState(null);
@@ -113,9 +115,12 @@ export const AppProvider = ({ children }) => {
               setSongs(prev => {
                 const updated = { ...prev };
                 firebaseSongs.forEach(song => {
+                  // Check if user owns this song
+                  const isOwned = userProfile?.ownedSongs?.[song.id] === true;
                   updated[`firebase_${song.id}`] = {
                     ...song,
-                    isFromFirebase: true
+                    isFromFirebase: true,
+                    isOwned: isOwned
                   };
                 });
                 console.log(`✅ Đã load ${firebaseSongs.length} bài từ Firebase`);
@@ -154,11 +159,13 @@ export const AppProvider = ({ children }) => {
             }
           });
 
-          // Thêm bài Firebase mới
+          // Thêm bài Firebase mới với isOwned từ userProfile
           updatedFirebaseSongs.forEach(song => {
+            const isOwned = userProfile?.ownedSongs?.[song.id] === true;
             newSongs[`firebase_${song.id}`] = {
               ...song,
-              isFromFirebase: true
+              isFromFirebase: true,
+              isOwned: isOwned
             };
           });
 
@@ -174,6 +181,34 @@ export const AppProvider = ({ children }) => {
       console.error('⚠️ Không thể setup Firebase listener:', error);
     }
   }, []);
+
+  // Sync isOwned từ userProfile khi userProfile thay đổi
+  useEffect(() => {
+    if (!userProfile || !userProfile.ownedSongs) return;
+
+    setSongs(prev => {
+      const updated = { ...prev };
+      let hasChanges = false;
+
+      Object.keys(updated).forEach(key => {
+        if (key.startsWith('firebase_')) {
+          const songId = key.replace('firebase_', '');
+          const isOwned = userProfile.ownedSongs[songId] === true;
+          
+          if (updated[key].isOwned !== isOwned) {
+            updated[key] = { ...updated[key], isOwned };
+            hasChanges = true;
+          }
+        }
+      });
+
+      if (hasChanges) {
+        console.log('🔄 Synced isOwned from userProfile');
+        return updated;
+      }
+      return prev;
+    });
+  }, [userProfile?.ownedSongs]);
 
   // --- HÀM CHỌN BÀI HÁT: Chỉ load và set currentSong, không phát ---
   const selectSong = async (songKey) => {
@@ -518,15 +553,52 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const buySong = (songKey, price) => {
-    if (confirm(`Mua bài "${songs[songKey].name}" giá ${price} xu?`)) {
-      setSongs(prev => ({
-        ...prev,
-        [songKey]: { ...prev[songKey], isOwned: true }
-      }));
-      return true;
+  const buySong = async (songKey, price) => {
+    const song = songs[songKey];
+    if (!song) return false;
+
+    // Kiểm tra đăng nhập
+    if (!user) {
+      alert('Vui lòng đăng nhập để mua bài hát!');
+      return false;
     }
-    return false;
+
+    // Kiểm tra số xu
+    if (!userProfile || userProfile.coins < price) {
+      alert(`Không đủ xu! Bạn có ${userProfile?.coins || 0} xu, cần ${price} xu`);
+      return false;
+    }
+
+    if (!confirm(`Mua bài "${song.name}" giá ${price} xu?`)) {
+      return false;
+    }
+
+    try {
+      // Gọi Firebase purchaseSong
+      const { purchaseSong } = await import('../../services/firebaseService');
+      const songId = songKey.replace('firebase_', ''); // Remove prefix
+      
+      const result = await purchaseSong(user.uid, songId, price);
+      
+      if (result.success) {
+        // Cập nhật state local
+        setSongs(prev => ({
+          ...prev,
+          [songKey]: { ...prev[songKey], isOwned: true }
+        }));
+
+        // Refresh user profile để cập nhật số xu
+        await refreshUserProfile();
+
+        alert(`✅ Mua thành công! Còn lại ${result.newCoins} xu`);
+        console.log(`✅ Purchased ${song.name} for ${price} coins`);
+        return true;
+      }
+    } catch (error) {
+      console.error('❌ Purchase error:', error);
+      alert(`Lỗi khi mua bài hát: ${error.message}`);
+      return false;
+    }
   };
 
   const toggleFavorite = (songKey) => {
