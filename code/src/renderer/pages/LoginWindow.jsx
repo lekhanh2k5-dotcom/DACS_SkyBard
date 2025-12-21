@@ -5,6 +5,7 @@ import '../styles/auth.css';
 export default function LoginWindow() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [displayName, setDisplayName] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
@@ -29,12 +30,17 @@ export default function LoginWindow() {
         try {
             if (showRegister) {
                 // Đăng ký
+                if (!displayName.trim()) {
+                    setError('Vui lòng nhập tên tài khoản');
+                    setLoading(false);
+                    return;
+                }
                 if (password.length < 6) {
                     setError('Mật khẩu phải có ít nhất 6 ký tự');
                     setLoading(false);
                     return;
                 }
-                await register(email, password);
+                await register(email, password, displayName);
                 alert('✅ Đăng ký thành công! Bạn đã nhận 1000 xu');
                 // Cửa sổ sẽ tự động đóng nhờ useEffect
             } else {
@@ -79,8 +85,19 @@ export default function LoginWindow() {
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     {error && (
-                        <div className="auth-error">
-                            ⚠️ {error}
+                    {showRegister && (
+                        <div className="form-group">
+                            <label htmlFor="displayName">Tên tài khoản</label>
+                            <input
+                                type="text"
+                                id="displayName"
+                                value={displayName}
+                                onChange={(e) => setDisplayName(e.target.value)}
+                                placeholder="Nhập tên của bạn"
+                                required
+                                disabled={loading}
+                                autoFocus={showRegister}
+                            />
                         </div>
                     )}
 
@@ -90,6 +107,11 @@ export default function LoginWindow() {
                             type="email"
                             id="email"
                             value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="your@email.com"
+                            required
+                            disabled={loading}
+                            autoFocus={!showRegister}ail}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="your@email.com"
                             required
@@ -115,7 +137,8 @@ export default function LoginWindow() {
                         )}
                     </div>
 
-                    <button
+                    <but    setDisplayName(''); // Clear display name khi chuyển mode
+                        ton
                         type="submit"
                         className="btn-auth"
                         disabled={loading}

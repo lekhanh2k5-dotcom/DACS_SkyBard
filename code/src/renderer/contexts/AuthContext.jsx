@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Đăng ký
-    const register = async (email, password) => {
+    const register = async (email, password, displayName = null) => {
         if (!auth) throw new Error('Firebase Auth not initialized');
         
         // Tạo user trong Firebase Auth
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
         
         // Tạo user profile trong Realtime Database (tặng 1000 xu)
         try {
-            const newProfile = await createUserProfile(userCredential.user.uid, email);
+            const newProfile = await createUserProfile(userCredential.user.uid, email, displayName);
             setUserProfile(newProfile); // Set profile ngay sau khi đăng ký
             console.log('✅ User registered with 1000 coins:', userCredential.user.email);
         } catch (error) {

@@ -177,6 +177,9 @@ export default function Settings() {
                                 </div>
                                 <div>
                                     <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '4px' }}>
+                                        {userProfile?.displayName || user.email.split('@')[0]}
+                                    </div>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-sub)', marginBottom: '4px' }}>
                                         {user.email}
                                     </div>
                                     <div style={{ fontSize: '14px', color: 'var(--text-sub)' }}>
